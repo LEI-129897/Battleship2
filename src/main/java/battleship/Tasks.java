@@ -40,6 +40,7 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		DatabaseManager dbManager = new DatabaseManager();
 		menuHelp();
 
 		System.out.print("> ");
@@ -72,6 +73,8 @@ public class Tasks {
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 
+						dbManager.saveMove("RAJADA_MANUAL", game.getRemainingShips());
+
 						if (game.getRemainingShips() == 0) {
 							game.over();
 							System.exit(0);
@@ -84,6 +87,7 @@ public class Tasks {
 							game.randomEnemyFire();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+							dbManager.saveMove("SIMULACAO", game.getRemainingShips());
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
