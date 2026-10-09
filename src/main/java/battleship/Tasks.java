@@ -52,11 +52,13 @@ public class Tasks {
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					GUI.display(game);
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					GUI.display(game);
 					break;
 				case STATUS:
 					if (myFleet != null)
@@ -65,12 +67,14 @@ public class Tasks {
 				case MAPA:
 					if (myFleet != null)
 						game.printMyBoard(false, true);
+						GUI.display(game);
 					break;
 				case RAJADA:
 					if (game != null) {
 						game.readEnemyFire(in);
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+						GUI.display(game);
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
@@ -84,6 +88,7 @@ public class Tasks {
 							game.randomEnemyFire();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+							GUI.display(game);
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
@@ -100,6 +105,7 @@ public class Tasks {
 				case TIROS:
 					if (game != null)
 						game.printMyBoard(true, true);
+						GUI.display(game);
 					break;
                 case AJUDA:
                     menuHelp();
