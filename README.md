@@ -134,6 +134,36 @@ mvn test
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
 
+### Tempo por jogada (consola)
+
+A [Issue #3](https://github.com/LEI-129897/Battleship2/issues/3), etiquetada
+`type: ENHANCEMENT`, é implementada no ramo `124790`.
+A dependência foi adicionada primeiro ao `pom.xml`: o GAV
+`org.apache.commons:commons-lang3:3.20.0`, disponível no
+[Maven Central](https://central.sonatype.com/artifact/org.apache.commons/commons-lang3/3.20.0).
+A medição utiliza o [StopWatch da Apache Commons Lang](https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/time/StopWatch.html).
+
+Depois de `gerafrota` ou `lefrota`, o cronómetro começa antes do próximo prompt.
+Termina assim que a linha da `rajada` é lida, antes do processamento dos tiros.
+Após cada rajada, a consola apresenta, por exemplo:
+
+```text
+Tempo da jogada nº1: 2.347 segundos.
+```
+
+Cada jogada tem um novo cronómetro, iniciado depois de apresentar os resultados
+da anterior. Os comandos `ajuda`, `estado`, `mapa` e `tiros` mantêm a medição em
+curso; carregar outra frota inicia uma nova partida e uma nova medição.
+O comando `simula` continua a executar jogadas automáticas, sem medir decisões
+do jogador.
+
+Para executar a versão de consola (o manifesto do JAR inicia o servidor REST):
+
+```bash
+mvn package
+java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main
+```
+
 ---
 
 ## 🤝 Contributing
