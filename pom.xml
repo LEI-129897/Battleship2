@@ -74,6 +74,8 @@
 		<allure.version>2.31.0</allure.version>
 
 		<jetbrains.annotations.version>26.1.0</jetbrains.annotations.version>
+
+		<commons.lang3.version>3.20.0</commons.lang3.version>
 	</properties>
 
 	<dependencies>
@@ -83,6 +85,13 @@
 			<artifactId>icu4j</artifactId>
 			<version>78.1</version>
 		</dependency>
+		<!-- Stopwatch for measuring each player's move (Maven Central) -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons.lang3.version}</version>
+		</dependency>
+
 		<!-- Spring Boot REST server (includes Jackson, embedded Tomcat) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -118,6 +127,12 @@
 			<artifactId>log4j-core</artifactId>
 			<version>${apache.log4j.version}</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.xerial</groupId>
+    		<artifactId>sqlite-jdbc</artifactId>
+    		<version>3.45.1.0</version>
 		</dependency>
 
 		<dependency>

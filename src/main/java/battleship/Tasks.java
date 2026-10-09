@@ -1,7 +1,9 @@
 package battleship;
 
+import java.util.Locale;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ public class Tasks {
 	/**
 	 * The constant LOGGER.
 	 */
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOGGER = LogManager.getLogger(Tasks.class);
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -75,6 +77,8 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		DatabaseManager dbManager = new DatabaseManager();
+		StopWatch moveTimer = null;
 		menuHelp();
 
 		System.out.print("> ");
@@ -127,6 +131,62 @@ public class Tasks {
 							Thread.currentThread().interrupt();
 						}
 					}
+			switch (command) {
+				case GERAFROTA:
+					myFleet = Fleet.createRandom();
+					game = new Game(myFleet);
+					game.printMyBoard(false, true);
+					moveTimer = null;
+					break;
+				case LEFROTA:
+					myFleet = buildFleet(in);
+					game = new Game(myFleet);
+					game.printMyBoard(false, true);
+					moveTimer = null;
+					break;
+				case STATUS:
+					if (myFleet != null)
+						myFleet.printStatus();
+					break;
+				case MAPA:
+					if (myFleet != null)
+						game.printMyBoard(false, true);
+					break;
+				case RAJADA:
+					if (game != null) {
+						String moveInput = in.nextLine();
+						moveTimer.stop();
+						try (Scanner moveScanner = new Scanner(moveInput + "\n")) {
+							game.readEnemyFire(moveScanner);
+						}
+						System.out.printf(Locale.ROOT, "Tempo da jogada nº%d: %.3f segundos.%n",
+								game.getAlienMoves().getLast().getNumber(),
+								moveTimer.getDuration().toNanos() / 1_000_000_000.0);
+						moveTimer = null;
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+
+						dbManager.saveMove("RAJADA_MANUAL", game.getRemainingShips());
+
+						if (game.getRemainingShips() == 0) {
+							game.over();
+							System.exit(0);
+						}
+					}
+					break;
+				case SIMULA:
+					if (game != null) {
+						while (game.getRemainingShips() > 0){
+							game.randomEnemyFire();
+							myFleet.printStatus();
+							game.printMyBoard(true, false);
+							dbManager.saveMove("SIMULACAO", game.getRemainingShips());
+							try {
+								Thread.sleep(3000);
+							} catch (InterruptedException e) {
+								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+							}
+						}
 
 					if (game.getRemainingShips() == 0) {
 						game.over();
@@ -146,6 +206,10 @@ public class Tasks {
 				System.out.println(GestorIdioma.getMensagem("comandoInvalido"));
 			}
 
+			// Start before waiting for input; queries keep the current move's timer.
+			if (game != null && moveTimer == null) {
+				moveTimer = StopWatch.createStarted();
+			}
 			System.out.print("> ");
 			command = in.next();
 		}
