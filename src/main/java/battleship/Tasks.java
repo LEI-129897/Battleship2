@@ -92,11 +92,13 @@ public class Tasks {
 				myFleet = Fleet.createRandom();
 				game = new Game(myFleet);
 				game.printMyBoard(false, true);
+        GUI.display(game);
 
 			} else if (command.equals(LEFROTA)) {
 				myFleet = buildFleet(in);
 				game = new Game(myFleet);
 				game.printMyBoard(false, true);
+        GUI.display(game);
 
 			} else if (command.equals(STATUS)) {
 				if (myFleet != null) {
@@ -106,6 +108,7 @@ public class Tasks {
 			} else if (command.equals(MAPA)) {
 				if (myFleet != null) {
 					game.printMyBoard(false, true);
+          GUI.display(game);
 				}
 
 			} else if (command.equals(RAJADA)) {
@@ -113,6 +116,7 @@ public class Tasks {
 					game.readEnemyFire(in);
 					myFleet.printStatus();
 					game.printMyBoard(true, false);
+          GUI.display(game);
 
 					if (game.getRemainingShips() == 0) {
 						game.over();
@@ -126,6 +130,7 @@ public class Tasks {
 						game.randomEnemyFire();
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+            GUI.display(game);
 						dbManager.saveMove("SIMULACAO", game.getRemainingShips());
 						try {
 							Thread.sleep(3000);
@@ -143,6 +148,7 @@ public class Tasks {
 			} else if (command.equals(TIROS)) {
 				if (game != null) {
 					game.printMyBoard(true, true);
+          GUI.display(game);
 				}
 
 			} else if (command.equals(AJUDA)) {
