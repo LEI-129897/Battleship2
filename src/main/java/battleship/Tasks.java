@@ -1,7 +1,9 @@
 package battleship;
 
+import java.util.Locale;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ public class Tasks {
 	/**
 	 * The constant LOGGER.
 	 */
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOGGER = LogManager.getLogger(Tasks.class);
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -34,7 +36,7 @@ public class Tasks {
 	private static String STATUS;
 	private static String SIMULA;
 
-
+	//função para escolher a lingua
 	public static void languageMenu(){
 		Scanner in = new Scanner(System.in);
 
@@ -76,6 +78,8 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		DatabaseManager dbManager = new DatabaseManager();
+		StopWatch moveTimer = null;
 		menuHelp();
 
 		System.out.print("> ");
@@ -121,7 +125,7 @@ public class Tasks {
 						game.randomEnemyFire();
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
-
+						dbManager.saveMove("SIMULACAO", game.getRemainingShips());
 						try {
 							Thread.sleep(3000);
 						} catch (InterruptedException e) {
@@ -147,6 +151,10 @@ public class Tasks {
 				System.out.println(GestorIdioma.getMensagem("comandoInvalido"));
 			}
 
+			// Start before waiting for input; queries keep the current move's timer.
+			if (game != null && moveTimer == null) {
+				moveTimer = StopWatch.createStarted();
+			}
 			System.out.print("> ");
 			command = in.next();
 		}
