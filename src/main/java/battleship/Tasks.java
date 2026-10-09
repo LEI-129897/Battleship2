@@ -37,6 +37,7 @@ public class Tasks {
 	private static String SIMULA;
 
 	//função para escolher a lingua
+
 	public static void languageMenu(){
 		Scanner in = new Scanner(System.in);
 
