@@ -77,6 +77,12 @@
 	</properties>
 
 	<dependencies>
+		<!-- To Translate the game -->
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>78.1</version>
+		</dependency>
 		<!-- Spring Boot REST server (includes Jackson, embedded Tomcat) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
