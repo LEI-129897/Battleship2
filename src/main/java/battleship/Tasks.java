@@ -20,25 +20,60 @@ public class Tasks {
 	/**
 	 * The constant GOODBYE_MESSAGE.
 	 */
-	private static final String GOODBYE_MESSAGE = "Bons ventos!";
+	//private static final String GOODBYE_MESSAGE = "Bons ventos!";
 
 	/**
 	 * Strings to be used by the user
 	 */
-	private static final String AJUDA = "ajuda";
-	private static final String GERAFROTA = "gerafrota";
-	private static final String LEFROTA = "lefrota";
-	private static final String DESISTIR = "desisto";
-	private static final String RAJADA = "rajada";
-	private static final String TIROS = "tiros";
-	private static final String MAPA = "mapa";
-	private static final String STATUS = "estado";
-	private static final String SIMULA = "simula";
+
+	private static String AJUDA;
+	private static String GERAFROTA;
+	private static String LEFROTA;
+	private static String DESISTIR;
+	private static String RAJADA;
+	private static String TIROS;
+	private static String MAPA;
+	private static String STATUS;
+	private static String SIMULA;
+
+	public static void languageMenu(){
+		Scanner in = new Scanner(System.in);
+
+		System.out.println("Choose your language / Escolha o idioma:");
+		System.out.println("1 - Português");
+		System.out.println("2 - English");
+		System.out.print("> ");
+
+		String escolha = in.next();
+
+		if (escolha.equals("2")) {
+			GestorIdioma.setIdioma("en");
+		} else {
+			GestorIdioma.setIdioma("pt");
+		}
+	}
+
+	private static void carregarComandos() {
+		AJUDA = GestorIdioma.getMensagem("cmdAjuda");
+		GERAFROTA = GestorIdioma.getMensagem("cmdGeraFrota");
+		LEFROTA = GestorIdioma.getMensagem("cmdLeFrota");
+		DESISTIR = GestorIdioma.getMensagem("cmdDesistir");
+		RAJADA = GestorIdioma.getMensagem("cmdRajada");
+		TIROS = GestorIdioma.getMensagem("cmdTiros");
+		MAPA = GestorIdioma.getMensagem("cmdMapa");
+		STATUS = GestorIdioma.getMensagem("cmdEstado");
+		SIMULA = GestorIdioma.getMensagem("cmdSimula");
+	}
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
 	 */
 	public static void menu() {
+		languageMenu();
+		carregarComandos();
+
+		Scanner in = new Scanner(System.in);
+
 
 		IFleet myFleet = null;
 		IGame game = null;
@@ -47,10 +82,55 @@ public class Tasks {
 		menuHelp();
 
 		System.out.print("> ");
-		Scanner in = new Scanner(System.in);
+		//Scanner in = new Scanner(System.in);
 		String command = in.next();
 		while (!command.equals(DESISTIR)) {
 
+			if (command.equals(GERAFROTA)) {
+				myFleet = Fleet.createRandom();
+				game = new Game(myFleet);
+				game.printMyBoard(false, true);
+
+			} else if (command.equals(LEFROTA)) {
+				myFleet = buildFleet(in);
+				game = new Game(myFleet);
+				game.printMyBoard(false, true);
+
+			} else if (command.equals(STATUS)) {
+				if (myFleet != null) {
+					myFleet.printStatus();
+				}
+
+			} else if (command.equals(MAPA)) {
+				if (myFleet != null) {
+					game.printMyBoard(false, true);
+				}
+
+			} else if (command.equals(RAJADA)) {
+				if (game != null) {
+					game.readEnemyFire(in);
+					myFleet.printStatus();
+					game.printMyBoard(true, false);
+
+					if (game.getRemainingShips() == 0) {
+						game.over();
+						System.exit(0);
+					}
+				}
+
+			} else if (command.equals(SIMULA)) {
+				if (game != null) {
+					while (game.getRemainingShips() > 0) {
+						game.randomEnemyFire();
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+						}
+					}
 			switch (command) {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
@@ -108,22 +188,24 @@ public class Tasks {
 							}
 						}
 
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							System.exit(0);
-						}
+					if (game.getRemainingShips() == 0) {
+						game.over();
+						System.exit(0);
 					}
-					break;
-				case TIROS:
-					if (game != null)
-						game.printMyBoard(true, true);
-					break;
-                case AJUDA:
-                    menuHelp();
-                    break;
-				default:
-					System.out.println("Que comando é esse??? Repete ...");
+				}
+
+			} else if (command.equals(TIROS)) {
+				if (game != null) {
+					game.printMyBoard(true, true);
+				}
+
+			} else if (command.equals(AJUDA)) {
+				menuHelp();
+
+			} else {
+				System.out.println(GestorIdioma.getMensagem("comandoInvalido"));
 			}
+
 			// Start before waiting for input; queries keep the current move's timer.
 			if (game != null && moveTimer == null) {
 				moveTimer = StopWatch.createStarted();
@@ -131,24 +213,41 @@ public class Tasks {
 			System.out.print("> ");
 			command = in.next();
 		}
-		System.out.println(GOODBYE_MESSAGE);
+		System.out.println(GestorIdioma.getMensagem("despedida"));
 	}
 
 	/**
 	 * This function provides help information about the menu commands.
 	 */
 	public static void menuHelp() {
-		System.out.println("======================= AJUDA DO MENU =========================");
-		System.out.println("Digite um dos comandos abaixo para interagir com o jogo:");
-		System.out.println("- " + GERAFROTA + ": Gera uma frota aleatória de navios.");
-		System.out.println("- " + LEFROTA + ": Permite criar e carregar uma frota personalizada.");
-		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
-		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
-		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
-		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
-		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
-		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
-		System.out.println("===============================================================");
+		System.out.println(GestorIdioma.getMensagem("ajudaTitulo"));
+		System.out.println(GestorIdioma.getMensagem("ajudaIntroducao"));
+
+		System.out.println("- " + GERAFROTA + ": "
+				+ GestorIdioma.getMensagem("geraFrota"));
+
+		System.out.println("- " + LEFROTA + ": "
+				+ GestorIdioma.getMensagem("leFrota"));
+
+		System.out.println("- " + STATUS + ": "
+				+ GestorIdioma.getMensagem("estado"));
+
+		System.out.println("- " + MAPA + ": "
+				+ GestorIdioma.getMensagem("mapa"));
+
+		System.out.println("- " + RAJADA + ": "
+				+ GestorIdioma.getMensagem("rajada"));
+
+		System.out.println("- " + SIMULA + ": "
+				+ GestorIdioma.getMensagem("simula"));
+
+		System.out.println("- " + TIROS + ": "
+				+ GestorIdioma.getMensagem("tiros"));
+
+		System.out.println("- " + DESISTIR + ": "
+				+ GestorIdioma.getMensagem("desistir"));
+
+		System.out.println(GestorIdioma.getMensagem("ajudaFim"));
 	}
 	/**
 	 * This operation allows the build up of a fleet, given user data

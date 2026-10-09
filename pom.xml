@@ -79,6 +79,12 @@
 	</properties>
 
 	<dependencies>
+		<!-- To Translate the game -->
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>78.1</version>
+		</dependency>
 		<!-- Stopwatch for measuring each player's move (Maven Central) -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
