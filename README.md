@@ -1,5 +1,9 @@
 # ⚓ Battleship 2.0
 
+## See the information in html
+
+To see the information in html, just search https://lei-129897.github.io/Battleship2/docs/index.html in the search bar (or just add /docs/index.html to the current domain)
+
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
