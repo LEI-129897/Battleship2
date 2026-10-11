@@ -1,9 +1,8 @@
 package battleship;
 
-import java.util.Locale;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,10 @@ public class Tasks {
 	//função para escolher a lingua
 
 	public static void languageMenu(){
-		Scanner in = new Scanner(System.in);
+		languageMenu(new Scanner(System.in));
+	}
+
+	private static void languageMenu(Scanner in) {
 
 		System.out.println("Choose your language / Escolha o idioma:");
 		System.out.println("1 - Português");
@@ -71,98 +73,87 @@ public class Tasks {
 	 * This task also tests the fighting element of a round of three shots
 	 */
 	public static void menu() {
-		languageMenu();
+		try {
+			menu(new Scanner(System.in), GUI::display);
+		} finally {
+			GUI.close();
+		}
+	}
+
+	static void menu(Scanner in, Consumer<GamePlaySession> displayBoard) {
+		languageMenu(in);
 		carregarComandos();
-
-		Scanner in = new Scanner(System.in);
-
-
-		IFleet myFleet = null;
-		IGame game = null;
+		GamePlaySession session = new GamePlaySession();
 		DatabaseManager dbManager = new DatabaseManager();
-		StopWatch moveTimer = null;
 		menuHelp();
-
 		System.out.print("> ");
-		//Scanner in = new Scanner(System.in);
+		if (!in.hasNext()) return;
 		String command = in.next();
 		while (!command.equals(DESISTIR)) {
-
 			if (command.equals(GERAFROTA)) {
-				myFleet = Fleet.createRandom();
-				game = new Game(myFleet);
-				game.printMyBoard(false, true);
-        GUI.display(game);
-
+				session.setGame(new Game(Fleet.createRandom()));
+				session.withGame(game -> game.printMyBoard(false, true));
+				displayBoard.accept(session);
 			} else if (command.equals(LEFROTA)) {
-				myFleet = buildFleet(in);
-				game = new Game(myFleet);
-				game.printMyBoard(false, true);
-        GUI.display(game);
-
+				session.setGame(new Game(buildFleet(in)));
+				session.withGame(game -> game.printMyBoard(false, true));
+				displayBoard.accept(session);
 			} else if (command.equals(STATUS)) {
-				if (myFleet != null) {
-					myFleet.printStatus();
-				}
-
+				session.withGame(game -> game.getMyFleet().printStatus());
 			} else if (command.equals(MAPA)) {
-				if (myFleet != null) {
-					game.printMyBoard(false, true);
-          GUI.display(game);
-				}
-
+				session.withGame(game -> game.printMyBoard(false, true));
+				if (session.hasGame()) displayBoard.accept(session);
 			} else if (command.equals(RAJADA)) {
-				if (game != null) {
-					game.readEnemyFire(in);
-					myFleet.printStatus();
-					game.printMyBoard(true, false);
-          GUI.display(game);
-
-					if (game.getRemainingShips() == 0) {
-						game.over();
-						System.exit(0);
+				if (session.hasGame() && !session.snapshot().finished()) {
+					String input = in.nextLine();
+					try {
+						session.fire(input);
+						session.withGame(game -> {
+							game.getMyFleet().printStatus();
+							game.printMyBoard(true, false);
+							if (game.getRemainingShips() == 0) game.over();
+						});
+					} catch (IllegalStateException exception) {
+						System.out.println(exception.getMessage());
 					}
+					displayBoard.accept(session);
+				} else if (session.hasGame()) {
+					in.nextLine();
+					System.out.println(GestorIdioma.getMensagem("guiFinished"));
 				}
-
 			} else if (command.equals(SIMULA)) {
-				if (game != null) {
-					while (game.getRemainingShips() > 0) {
-						game.randomEnemyFire();
-						myFleet.printStatus();
-						game.printMyBoard(true, false);
-            GUI.display(game);
-						dbManager.saveMove("SIMULACAO", game.getRemainingShips());
-						try {
+				if (session.hasGame() && !session.snapshot().finished()) {
+					session.beginSimulation();
+					try {
+						while (!session.snapshot().finished()) {
+							session.simulateMove();
+							session.withGame(game -> {
+								game.getMyFleet().printStatus();
+								game.printMyBoard(true, false);
+								dbManager.saveMove("SIMULACAO", game.getRemainingShips());
+							});
+							displayBoard.accept(session);
 							Thread.sleep(3000);
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
 						}
+					} catch (InterruptedException exception) {
+						Thread.currentThread().interrupt();
+					} finally {
+						session.endSimulation();
 					}
-
-					if (game.getRemainingShips() == 0) {
-						game.over();
-						System.exit(0);
-					}
+					if (session.snapshot().finished()) session.withGame(IGame::over);
+					displayBoard.accept(session);
 				}
-
 			} else if (command.equals(TIROS)) {
-				if (game != null) {
-					game.printMyBoard(true, true);
-          GUI.display(game);
-				}
-
+				session.withGame(game -> game.printMyBoard(true, true));
+				if (session.hasGame()) displayBoard.accept(session);
 			} else if (command.equals(AJUDA)) {
 				menuHelp();
-
 			} else {
 				System.out.println(GestorIdioma.getMensagem("comandoInvalido"));
 			}
-
-			// Start before waiting for input; queries keep the current move's timer.
-			if (game != null && moveTimer == null) {
-				moveTimer = StopWatch.createStarted();
-			}
+			session.beginMove();
 			System.out.print("> ");
+			if (!in.hasNext()) break;
 			command = in.next();
 		}
 		System.out.println(GestorIdioma.getMensagem("despedida"));
