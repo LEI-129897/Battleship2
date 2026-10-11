@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,14 +51,14 @@ class TasksMoveTimingTest {
 	void measuresDecisionAndInputTimeSeparatelyForEachMove() {
 		Locale.setDefault(Locale.GERMANY);
 		System.setIn(new ScriptedInput(
-				new InputChunk("gerafrota\n", 0),
+				new InputChunk("1\ngerafrota\n", 0),
 				new InputChunk("ajuda\nestado\nmapa\ntiros\ninvalido\n", 150),
 				new InputChunk("rajada ", 0),
 				new InputChunk("A1 B2 C3\n", 120),
 				new InputChunk("rajada A 1 D 4 E 5\n", 30),
 				new InputChunk("desisto\n", 0)));
 
-		Tasks.menu();
+		runMenu();
 
 		List<Double> times = moveTimes();
 		assertEquals(2, times.size());
@@ -87,11 +89,11 @@ class TasksMoveTimingTest {
 			}
 		});
 		System.setIn(new ScriptedInput(
-				new InputChunk("gerafrota\n", 0),
+				new InputChunk("1\ngerafrota\n", 0),
 				new InputChunk("rajada A1 B2 C3\n", 50),
 				new InputChunk("desisto\n", 0)));
 
-		Tasks.menu();
+		runMenu();
 
 		List<Double> times = moveTimes();
 		assertEquals(1, times.size());
@@ -102,12 +104,12 @@ class TasksMoveTimingTest {
 	@Test
 	void startsANewMeasurementWhenTheFleetIsReplaced() {
 		System.setIn(new ScriptedInput(
-				new InputChunk("gerafrota\n", 0),
+				new InputChunk("1\ngerafrota\n", 0),
 				new InputChunk("gerafrota\n", 250),
 				new InputChunk("rajada A1 B2 C3\n", 20),
 				new InputChunk("desisto\n", 0)));
 
-		Tasks.menu();
+		runMenu();
 
 		List<Double> times = moveTimes();
 		assertEquals(1, times.size());
@@ -117,21 +119,80 @@ class TasksMoveTimingTest {
 	@Test
 	void doesNotReportTimeForCommandsWithoutAMove() {
 		System.setIn(new ScriptedInput(new InputChunk(
-				"rajada\najuda\ngerafrota\nestado\nmapa\ntiros\ndesisto\n", 0)));
+				"1\nrajada\najuda\ngerafrota\nestado\nmapa\ntiros\ndesisto\n", 0)));
 
-		Tasks.menu();
+		runMenu();
 
 		assertTrue(moveTimes().isEmpty());
 	}
 
 	@Test
 	void preservesValidationForAnEmptySubmittedMove() {
-		System.setIn(new ScriptedInput(new InputChunk("gerafrota\nrajada\ndesisto\n", 0)));
+		System.setIn(new ScriptedInput(new InputChunk("1\ngerafrota\nrajada\ndesisto\n", 0)));
 
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, Tasks::menu);
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, this::runMenu);
 
-		assertEquals("Você deve inserir exatamente 3 posições!", exception.getMessage());
+		assertEquals(GestorIdioma.getMensagemFormatada("numeroPosicoes", Game.NUMBER_SHOTS),
+				exception.getMessage());
 		assertTrue(moveTimes().isEmpty());
+	}
+
+	@Test
+	void terminalAndGuiMovesShareTheSameHistoryAndTimer() {
+		System.setIn(new ScriptedInput(new InputChunk(
+				"1\ngerafrota\nrajada D4 E5 F6\ndesisto\n", 0)));
+		AtomicReference<GamePlaySession> shared = new AtomicReference<>();
+		try (Scanner in = new Scanner(System.in)) {
+			Tasks.menu(in, session -> {
+				if (shared.compareAndSet(null, session)) {
+					GamePlaySession.BoardSnapshot board = session.snapshot();
+					session.fire(List.of(new Position('A', 1), new Position('B', 2), new Position('C', 3)),
+							board.generation(), board.nextMove());
+				}
+			});
+		}
+
+		assertEquals(2, moveTimes().size());
+		assertEquals(3, shared.get().snapshot().nextMove());
+		double displayedGuiTime = Double.parseDouble(String.format(Locale.ROOT, "%.3f",
+				shared.get().snapshot().lastMove().seconds()));
+		assertEquals(displayedGuiTime, moveTimes().getLast(), "GUI and terminal display the same final duration");
+	}
+
+	@Test
+	void terminalStaysOpenIfGuiFinishesWhileCoordinatesAreBeingEntered() {
+		AtomicReference<GamePlaySession> shared = new AtomicReference<>();
+		System.setIn(new ScriptedInput(
+				new InputChunk("1\ngerafrota\n", 0),
+				new InputChunk("rajada ", 0),
+				new InputChunk("D4 E5 F6\n", 0, () -> {
+					GamePlaySession session = shared.get();
+					GamePlaySession.BoardSnapshot board = session.snapshot();
+					session.fire(List.of(new Position('A', 1), new Position('B', 2), new Position('C', 3)),
+							board.generation(), board.nextMove());
+				}),
+				new InputChunk("desisto\n", 0)));
+		try (Scanner in = new Scanner(System.in)) {
+			Tasks.menu(in, session -> {
+				if (shared.compareAndSet(null, session)) {
+					Fleet fleet = new Fleet();
+					fleet.addShip(new Barge(Compass.NORTH, new Position('A', 1)));
+					session.setGame(new Game(fleet));
+				}
+			});
+		}
+
+		assertEquals(1, moveTimes().size());
+		assertTrue(shared.get().snapshot().finished());
+		String console = output.toString(StandardCharsets.UTF_8);
+		assertTrue(console.contains(GestorIdioma.getMensagem("guiFinished")));
+		assertTrue(console.endsWith("Bons ventos!" + System.lineSeparator()));
+	}
+
+	private void runMenu() {
+		try (Scanner in = new Scanner(System.in)) {
+			Tasks.menu(in, game -> {});
+		}
 	}
 
 	private List<Double> moveTimes() {
@@ -144,7 +205,11 @@ class TasksMoveTimingTest {
 		return times;
 	}
 
-	private record InputChunk(String text, long delayMillis) {}
+	private record InputChunk(String text, long delayMillis, Runnable beforeRead) {
+		InputChunk(String text, long delayMillis) {
+			this(text, delayMillis, () -> {});
+		}
+	}
 
 	/** Supplies input in stages to model a player deciding and then submitting. */
 	private static class ScriptedInput extends InputStream {
@@ -188,6 +253,7 @@ class TasksMoveTimingTest {
 					Thread.currentThread().interrupt();
 					throw new IOException(exception);
 				}
+				chunk.beforeRead().run();
 				bytes = chunk.text().getBytes(StandardCharsets.UTF_8);
 				offset = 0;
 			}

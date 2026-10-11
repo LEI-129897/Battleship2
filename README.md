@@ -5,7 +5,7 @@
 To see the information in html, just search https://lei-129897.github.io/Battleship2/docs/index.html in the search bar (or just add /docs/index.html to the current domain)
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
+![Java Version](https://img.shields.io/badge/Java-21%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
@@ -46,7 +46,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ---
 
 ## 🛠 Technical Stack
-* **Language:** Java 17
+* **Language:** Java 21
 * **Build Tool:** Maven / Gradle
 * **Testing:** JUnit 5
 * **Logging:** Log4j2
@@ -56,7 +56,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-* JDK 17 or higher
+* JDK 21 or higher
 * Git
 
 ### Step-by-Step
@@ -70,7 +70,8 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
    ```
 3. **Compile and Run:**
    ```bash
-   javac Main.java && java Main
+   mvn package
+   java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main
    ```
 
 ---
@@ -134,7 +135,30 @@ mvn test
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
 
-### Tempo por jogada (consola)
+### Play in the GUI
+
+Start directly in the graphical window, with a random fleet and English controls:
+
+```bash
+mvn package
+java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main --gui --en
+```
+
+Omit `--en` for Portuguese. Select three different cells and click **Fire 3 shots**
+(`Disparar 3 tiros`). Click a selected cell again to remove it, or use **Clear selection**.
+The window shows hits, water shots, ships remaining and a live **Current move time**
+counter, refreshed every 100 ms. After firing, the final decision time stays under
+**Last move** and is also printed in the terminal, in seconds with three decimal places.
+Use **New game** to restart, and **Show ships** to show or hide the fleet.
+
+Starting `battleship.Main` without `--gui` keeps the terminal commands. After
+`gerafrota` / `randomfleet` or `lefrota` / `loadfleet`, the window opens and both
+interfaces control the same game. Previously fired cells cannot be selected in
+the GUI. GUI controls pause during the terminal's automatic simulation.
+Closing the window in terminal mode hides it; a board command opens it again.
+The terminal's `desisto` / `quit` ends the application.
+
+### Tempo por jogada (consola e GUI)
 
 A [Issue #3](https://github.com/LEI-129897/Battleship2/issues/3), etiquetada
 `type: ENHANCEMENT`, é implementada no ramo `124790`.
@@ -154,6 +178,11 @@ Tempo da jogada nº1: 2.347 segundos.
 Cada jogada tem um novo cronómetro, iniciado depois de apresentar os resultados
 da anterior. Os comandos `ajuda`, `estado`, `mapa` e `tiros` mantêm a medição em
 curso; carregar outra frota inicia uma nova partida e uma nova medição.
+As jogadas submetidas na GUI utilizam o mesmo cronómetro e apresentam o tempo
+na janela e na consola. Na GUI, **Tempo da jogada atual** mostra a contagem em
+curso, atualizada a cada 100 ms; **Última jogada** mantém o tempo final depois do
+disparo. O contador reinicia para cada nova jogada ou partida e fica inativo
+quando a partida termina ou durante uma simulação automática.
 O comando `simula` continua a executar jogadas automáticas, sem medir decisões
 do jogador.
 
