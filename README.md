@@ -12,6 +12,37 @@ To see the information in html, just search [https://lei-129897.github.io/Battle
 
 ---
 
+## Link do vídeo de demonstração
+* 
+
+
+## Prompt final da estratégia do LLM
+Considere agora a seguinte tática rigorosa para a geração de rajadas de 3 tiros na Batalha Naval:
+
+Diário de Bordo e Estado do Mapa:
+1. Mantenha uma representação do tabuleiro 10x10 (A a J, 1 a 10) e do histórico de jogadas.
+Registe cada rajada (Rajada 1, 2, 3...) com os tiros exatos e o resultado do JSON retornado pelo programa.
+Classifique cada posição como: ÁGUA, IMPACTO, AFUNDADO ou DESCONHECIDO.
+
+2. Validação Estrita de Tiros:
+NUNCA dispare fora dos limites do tabuleiro (linhas A a J, colunas 1 a 10).
+NUNCA repita coordenadas já testadas em rajadas anteriores ou na própria rajada. A única exceção é a última rajada do jogo para perfazer os 3 tiros obrigatórios quando restarem menos de 3 posições válidas.
+
+3. Caça e Orientação de Navios:
+Se a resposta indicar um impacto ("hitsOnBoats"), priorize na rajada seguinte as posições contíguas (Norte, Sul, Este, Oeste) para descobrir a orientação do navio.
+Como Caravelas, Naus e Fragatas são em linha reta, um segundo tiro certeiro define o eixo (horizontal ou vertical).
+As posições diagonais a um impacto confirmado em navios lineares são GARANTIDAMENTE ÁGUA. Evite disparar nessas diagonais para poupar tiros.
+
+4. Halo de Proteção (Navio Afundado):
+Quando o JSON confirmar que um navio foi afundado ("sunkBoats"), cruze com o Diário de Bordo para mapear a carcaça completa.
+Como os navios NUNCA se podem tocar (nem pelos cantos/diagonais), marque todas as quadrículas adjacentes (o halo de 1 posição ao redor do navio) como ÁGUA intransitável. NUNCA dispare para este perímetro.
+
+5. Formato Especial do Galeão (T):
+Lembre-se que o Galeão ocupa 5 posições em forma de T (corpo de 3 + 2 asas numa das extremidades). Se identificar 3 tiros alinhados e o navio não afundar, investigue as posições laterais da extremidade.
+
+6. Saída do Modelo:
+Responda APENAS com a estrutura JSON da próxima rajada de 3 tiros, acompanhada pelo registo atualizado do seu Diário de Bordo. 
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
