@@ -22,7 +22,8 @@ public class Game implements IGame
 	 * @param showLegend  if true, displays an explanatory legend of the symbols used
 	 *                    to represent various elements such as ships, misses, hits, etc.
 	 */
-	public static void printBoard(IFleet fleet, List<IMove> moves, boolean show_shots, boolean showLegend) {
+	public static void printBoard(IFleet fleet, List<IMove> moves,
+								  boolean show_shots, boolean showLegend) {
 
 		assert fleet != null;
 		assert moves != null;
@@ -41,10 +42,20 @@ public class Game implements IGame
 		printBoardFrame(map);
 
 		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
+			System.out.println("          " + GestorIdioma.getMensagem("legenda"));
+			System.out.println("'" + SHIP_MARKER + "' -> "
+					+ GestorIdioma.getMensagem("navio") + ", '"
+					+ SHIP_ADJACENT_MARKER + "' -> "
+					+ GestorIdioma.getMensagem("adjacenteNavio") + ", '"
+					+ EMPTY_MARKER + "' -> "
+					+ GestorIdioma.getMensagem("agua"));
+
+			System.out.println("'" + SHOT_SHIP_MARKER + "' -> "
+					+ GestorIdioma.getMensagem("tiroCerteiro") + ", '"
+					+ SHOT_WATER_MARKER + "' -> "
+					+ GestorIdioma.getMensagem("tiroAgua"));
 		}
+
 		System.out.println();
 	}
 
@@ -257,7 +268,7 @@ public class Game implements IGame
 				shots.add(newShot);
 		}
 
-		System.out.print("rajada ");
+		System.out.print(GestorIdioma.getMensagem("cmdRajada") + " ");
 		for (IPosition shot : shots)
 			System.out.print(shot + " ");
 		System.out.println();
@@ -301,7 +312,10 @@ public class Game implements IGame
 					int row = inputScanner.nextInt();
 					shots.add(new Position(token.toUpperCase().charAt(0), row));
 				} else {
-					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
+					throw new IllegalArgumentException(
+							GestorIdioma.getMensagem("posicaoIncompleta")
+									+ " '" + token + "'"
+					);
 				}
 			} else {
 				// Caso o token já contenha a coluna e a linha juntas (ex.: "A3")
@@ -311,7 +325,10 @@ public class Game implements IGame
 		}
 
 		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições!");
+			throw new IllegalArgumentException(
+					GestorIdioma.getMensagem("numeroPosicoes")
+							.replace("{0}", String.valueOf(NUMBER_SHOTS))
+			);
 		}
 
 		this.fireShots(shots);
@@ -337,7 +354,10 @@ public class Game implements IGame
 
 		List<ShotResult> shotResults = new ArrayList<ShotResult>();
 		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
+			throw new IllegalArgumentException(
+					GestorIdioma.getMensagem("numeroTiros")
+							.replace("{0}", String.valueOf(NUMBER_SHOTS))
+			);
 		}
 
 		List<IPosition> alreadyShot = new ArrayList<IPosition>();
@@ -447,9 +467,11 @@ public class Game implements IGame
 	}
 
 	public void over() {
+
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
-			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
+			System.out.println("| " + GestorIdioma.getMensagem("fimJogo"));
 			System.out.println("+--------------------------------------------------------------+");
+
 	}
 }

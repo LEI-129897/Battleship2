@@ -1,12 +1,47 @@
 # ⚓ Battleship 2.0
 
+## See the information in html
+
+To see the information in html, just search [https://lei-129897.github.io/Battleship2/docs/index.html](https://lei-129897.github.io/Battleship2/) in the search bar (or just add /docs/index.html to the current domain)
+
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Java Version](https://img.shields.io/badge/Java-17%2B-blue)
+![Java Version](https://img.shields.io/badge/Java-21%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
 
 ---
+
+## Link do vídeo de demonstração
+* https://youtu.be/UBG5kvmt-J0
+
+
+## Prompt final da estratégia do LLM
+Considere agora a seguinte tática rigorosa para a geração de rajadas de 3 tiros na Batalha Naval:
+
+Diário de Bordo e Estado do Mapa:
+1. Mantenha uma representação do tabuleiro 10x10 (A a J, 1 a 10) e do histórico de jogadas.
+Registe cada rajada (Rajada 1, 2, 3...) com os tiros exatos e o resultado do JSON retornado pelo programa.
+Classifique cada posição como: ÁGUA, IMPACTO, AFUNDADO ou DESCONHECIDO.
+
+2. Validação Estrita de Tiros:
+NUNCA dispare fora dos limites do tabuleiro (linhas A a J, colunas 1 a 10).
+NUNCA repita coordenadas já testadas em rajadas anteriores ou na própria rajada. A única exceção é a última rajada do jogo para perfazer os 3 tiros obrigatórios quando restarem menos de 3 posições válidas.
+
+3. Caça e Orientação de Navios:
+Se a resposta indicar um impacto ("hitsOnBoats"), priorize na rajada seguinte as posições contíguas (Norte, Sul, Este, Oeste) para descobrir a orientação do navio.
+Como Caravelas, Naus e Fragatas são em linha reta, um segundo tiro certeiro define o eixo (horizontal ou vertical).
+As posições diagonais a um impacto confirmado em navios lineares são GARANTIDAMENTE ÁGUA. Evite disparar nessas diagonais para poupar tiros.
+
+4. Halo de Proteção (Navio Afundado):
+Quando o JSON confirmar que um navio foi afundado ("sunkBoats"), cruze com o Diário de Bordo para mapear a carcaça completa.
+Como os navios NUNCA se podem tocar (nem pelos cantos/diagonais), marque todas as quadrículas adjacentes (o halo de 1 posição ao redor do navio) como ÁGUA intransitável. NUNCA dispare para este perímetro.
+
+5. Formato Especial do Galeão (T):
+Lembre-se que o Galeão ocupa 5 posições em forma de T (corpo de 3 + 2 asas numa das extremidades). Se identificar 3 tiros alinhados e o navio não afundar, investigue as posições laterais da extremidade.
+
+6. Saída do Modelo:
+Responda APENAS com a estrutura JSON da próxima rajada de 3 tiros, acompanhada pelo registo atualizado do seu Diário de Bordo. 
 
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
@@ -42,7 +77,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ---
 
 ## 🛠 Technical Stack
-* **Language:** Java 17
+* **Language:** Java 21
 * **Build Tool:** Maven / Gradle
 * **Testing:** JUnit 5
 * **Logging:** Log4j2
@@ -52,7 +87,7 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-* JDK 17 or higher
+* JDK 21 or higher
 * Git
 
 ### Step-by-Step
@@ -66,7 +101,8 @@ Hits are calculated based on the intersection of the shot vector and the ship's 
    ```
 3. **Compile and Run:**
    ```bash
-   javac Main.java && java Main
+   mvn package
+   java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main
    ```
 
 ---
@@ -129,6 +165,64 @@ mvn test
 
 > [!TIP]
 > Use the `-Dtest=ClassName` flag to run specific test suites during development.
+
+### Play in the GUI
+
+Start directly in the graphical window, with a random fleet and English controls:
+
+```bash
+mvn package
+java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main --gui --en
+```
+
+Omit `--en` for Portuguese. Select three different cells and click **Fire 3 shots**
+(`Disparar 3 tiros`). Click a selected cell again to remove it, or use **Clear selection**.
+The window shows hits, water shots, ships remaining and a live **Current move time**
+counter, refreshed every 100 ms. After firing, the final decision time stays under
+**Last move** and is also printed in the terminal, in seconds with three decimal places.
+Use **New game** to restart, and **Show ships** to show or hide the fleet.
+
+Starting `battleship.Main` without `--gui` keeps the terminal commands. After
+`gerafrota` / `randomfleet` or `lefrota` / `loadfleet`, the window opens and both
+interfaces control the same game. Previously fired cells cannot be selected in
+the GUI. GUI controls pause during the terminal's automatic simulation.
+Closing the window in terminal mode hides it; a board command opens it again.
+The terminal's `desisto` / `quit` ends the application.
+
+### Tempo por jogada (consola e GUI)
+
+A [Issue #3](https://github.com/LEI-129897/Battleship2/issues/3), etiquetada
+`type: ENHANCEMENT`, é implementada no ramo `124790`.
+A dependência foi adicionada primeiro ao `pom.xml`: o GAV
+`org.apache.commons:commons-lang3:3.20.0`, disponível no
+[Maven Central](https://central.sonatype.com/artifact/org.apache.commons/commons-lang3/3.20.0).
+A medição utiliza o [StopWatch da Apache Commons Lang](https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/time/StopWatch.html).
+
+Depois de `gerafrota` ou `lefrota`, o cronómetro começa antes do próximo prompt.
+Termina assim que a linha da `rajada` é lida, antes do processamento dos tiros.
+Após cada rajada, a consola apresenta, por exemplo:
+
+```text
+Tempo da jogada nº1: 2.347 segundos.
+```
+
+Cada jogada tem um novo cronómetro, iniciado depois de apresentar os resultados
+da anterior. Os comandos `ajuda`, `estado`, `mapa` e `tiros` mantêm a medição em
+curso; carregar outra frota inicia uma nova partida e uma nova medição.
+As jogadas submetidas na GUI utilizam o mesmo cronómetro e apresentam o tempo
+na janela e na consola. Na GUI, **Tempo da jogada atual** mostra a contagem em
+curso, atualizada a cada 100 ms; **Última jogada** mantém o tempo final depois do
+disparo. O contador reinicia para cada nova jogada ou partida e fica inativo
+quando a partida termina ou durante uma simulação automática.
+O comando `simula` continua a executar jogadas automáticas, sem medir decisões
+do jogador.
+
+Para executar a versão de consola (o manifesto do JAR inicia o servidor REST):
+
+```bash
+mvn package
+java -cp target/BattleshipGamePlayer-2.0.jar battleship.Main
+```
 
 ---
 
