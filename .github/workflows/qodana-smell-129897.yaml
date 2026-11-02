@@ -24,6 +24,6 @@ jobs:
       - name: Run Qodana Quality Gate
         uses: JetBrains/qodana-action@v2024.3.4
         with:
-          args: --config=qodana-129897.yaml --print-problems
+          args: --config=qodana-129897.yaml 
           use-annotations: true
           post-pr-comment: true
