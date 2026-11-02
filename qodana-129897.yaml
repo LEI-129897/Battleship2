@@ -1,6 +1,6 @@
 # 129897 - Pedro Figueiredo
 version: "1.0"
-linter: jetbrains/qodana-jvm-community:2024.3
+linter: qodana-jvm-community
 projectJDK: "17"
 
 profile:

@@ -1,4 +1,3 @@
-
 # 129897 - Pedro Figueiredo
 name: Qodana smell gate 129897
 
@@ -20,11 +19,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
           fetch-depth: 0
 
       - name: Run Qodana Quality Gate
         uses: JetBrains/qodana-action@v2024.3.4
         with:
+          args: --config qodana-129897.yaml
           use-annotations: true
           post-pr-comment: true
