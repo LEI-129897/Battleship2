@@ -7,10 +7,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  checks: write
-
 jobs:
   checkstyle:
     runs-on: ubuntu-latest
@@ -24,8 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Run Checkstyle
-        uses: nikitasmss/checkstyle-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          checkstyle_config: checkstyle-129897.xml
+      - name: Download Checkstyle CLI
+        run: |
+          wget https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.15.0/checkstyle-10.15.0-all.jar -O checkstyle.jar
+
+      - name: Run Checkstyle Analysis
+        run: |
+          java -jar checkstyle.jar -c checkstyle-129897.xml .
