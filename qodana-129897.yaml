@@ -4,7 +4,6 @@ linter: jetbrains/qodana-jvm-community:2024.3
 projectJDK: "17"
 
 profile:
-  name: profile-129897
   path: qodana/profiles/profile-129897.yaml
 
 failureConditions:
