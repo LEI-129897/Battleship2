@@ -1,0 +1,11 @@
+# 129897 - Pedro Figueiredo
+version: "1.0"
+linter: jetbrains/qodana-jvm-community:2024.3
+projectJDK: "17" 
+
+profile:
+  path: qodana/profiles/profile-129897.yaml
+
+failureConditions:
+  severityThresholds:
+    any: 0
