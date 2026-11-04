@@ -6,5 +6,5 @@ inspections:
   - inspection: OverlyLongMethod
     enabled: true
     options:
-      m_limit: 60
+      m_limit: 30
       m_ignoreEmptyLines: true
