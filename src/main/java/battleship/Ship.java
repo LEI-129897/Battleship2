@@ -69,6 +69,44 @@ public abstract class Ship implements IShip
         default:
             s = null;
         }
+		int a;
+		int b;
+		int c;
+		int d; 
+		int f;
+		int g;
+		int w;
+		int y;
+		int h;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		int n;
+		int o;
+		int p;
+		int r;
+		int q;
+		int z;
+		int t;
+		int as;
+		int asddf;
+		int sdhdh;
+		int shdbhdhs;
+		int shbshdshd;
+		int sjkdbskjdsjb;
+		int akhdbshgfagfe;
+		int kajsdbadjakb;
+		int ahhdaufa;
+		int hshwhuyww;
+		int shhshshshhhhs;
+		int aiuigfiegf;
+		int aduwiduid;
+		int oqoqoqoqoqoqo;
+		int sdbuduD;
+		int ifhhhdhdhd;
+		int shhshhshhshs;
         return s;
     }
 
