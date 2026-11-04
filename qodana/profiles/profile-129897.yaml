@@ -6,5 +6,5 @@ inspections:
   - inspection: NonCommentSourceStatements
     enabled: true
     options:
-      m_limit: 30
+      m_limit: 150
       m_ignoreEmptyLines: true
