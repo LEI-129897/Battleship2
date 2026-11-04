@@ -1,10 +1,10 @@
 # 129897 - Pedro Figueiredo
 name: profile-129897
-base: empty
+baseProfile: empty
 
 inspections:
-  - inspection: OverlyLongMethod
+  - inspection: NonCommentSourceStatements
     enabled: true
     options:
-      m_limit: 60
+      m_limit: 150
       m_ignoreEmptyLines: true
