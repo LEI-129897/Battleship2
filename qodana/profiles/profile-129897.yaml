@@ -3,7 +3,7 @@ name: profile-129897
 baseProfile: empty
 
 inspections:
-  - inspection: OverlyLongMethod
+  - inspection: NonCommentSourceStatements
     enabled: true
     options:
       m_limit: 30
