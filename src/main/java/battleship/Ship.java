@@ -107,6 +107,11 @@ public abstract class Ship implements IShip
 		int sdbuduD;
 		int ifhhhdhdhd;
 		int shhshhshhshs;
+		int shabhsbdshdhsds;
+		int abasasahsjahsjasakgs;
+		int ashahsashgahsg;
+		int akskgsdgadyawDas;
+		int ajhsagsagags;
         return s;
     }
 
