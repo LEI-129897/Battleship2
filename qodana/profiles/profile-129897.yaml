@@ -1,6 +1,6 @@
 # 129897 - Pedro Figueiredo
 name: profile-129897
-base: empty
+baseProfile: empty
 
 inspections:
   - inspection: OverlyLongMethod
