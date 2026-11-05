@@ -1,2 +1,19 @@
-version: "1.0"
-linter: jetbrains/qodana-jvm-community:2024.3
+name: Qodana Code Quality Check
+
+on:
+  workflow_dispatch: # Permite correr manualmente na aba Actions do GitHub
+  push:
+    branches: [ "main" ]
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2023.2.0
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
