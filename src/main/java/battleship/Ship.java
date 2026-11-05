@@ -113,9 +113,6 @@ public abstract class Ship implements IShip
 		this.bearing = Objects.requireNonNull(bearing, "Ship's bearing must not be null");
 		this.pos = Objects.requireNonNull(pos, "Ship's position must not be null");
 	
-		this.category = category;
-		this.bearing = bearing;
-		this.pos = pos;
 		this.size = size;
 
 		positions = new ArrayList<>();
@@ -369,7 +366,7 @@ public abstract class Ship implements IShip
     @Override
     public boolean tooCloseTo(IPosition pos)
     {
-		assert pos != null;
+		Objects.requireNonNull(pos, "A posição não pode ser nula");
 
 		for (int i = 0; i < this.getSize(); i++)
 			if (getPositions().get(i).isAdjacentTo(pos))
@@ -379,8 +376,6 @@ public abstract class Ship implements IShip
 
 	public boolean isInsideBoard()
 	{
-		assert this != null;
-
 		return (getLeftMostPos() >= 0 && getRightMostPos() <= Game.BOARD_SIZE - 1 && getTopMostPos() >= 0
 				&& getBottomMostPos() <= Game.BOARD_SIZE - 1);
 	}

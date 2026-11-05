@@ -20,22 +20,22 @@ public class Frigate extends Ship {
 		super("Fragata", bearing, pos, 4);
 
 		switch (bearing) {
-			case NORTH:
-				for (int r = 0; r < this.getSize(); r++)
-					getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
+			case NORTH, SOUTH:
+				addVerticalPositions(pos);
 				break;
-			case SOUTH:
-				for (int r = 0; r < this.getSize(); r++)
-					getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
-				break;
-			case EAST:
-				for (int c = 0; c < this.getSize(); c++)
-					getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
-				break;
-			case WEST:
-				for (int c = 0; c < this.getSize(); c++)
-					getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
+			case EAST, WEST:
+				addHorizontalPositions(pos);
 				break;
 		}
+	}
+
+	private void addHorizontalPositions(IPosition pos) {
+		for (int c = 0; c < this.getSize(); c++)
+			getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
+	}
+
+	private void addVerticalPositions(IPosition pos) {
+		for (int r = 0; r < this.getSize(); r++)
+			getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
 	}
 }
