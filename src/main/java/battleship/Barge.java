@@ -22,5 +22,8 @@ public class Barge extends Ship {
 		// Add the single position of the barge to the list of positions
 		getPositions().add(new Position(pos.getRow(), pos.getColumn()));
 	}
+
+	public void smell(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) {
+	}
 }
 
