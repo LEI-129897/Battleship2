@@ -23,7 +23,6 @@ public class Barge extends Ship {
 		getPositions().add(new Position(pos.getRow(), pos.getColumn()));
 	}
 
-	public void smell(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) {
-	}
+	class barge{}
 }
 
