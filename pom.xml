@@ -188,7 +188,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Plugin to get HTML report on tests-->
+			<!-- Plugin to get HTML report on tests (Only for DatabaseManager.class) -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
