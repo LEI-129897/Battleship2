@@ -6,6 +6,5 @@ profile:
   path: .qodana/profiles/profile-129837.yaml
 failureConditions:
   severityThresholds:
-    any:
-      critical: 0
-      high: 3
+    critical: 0
+    high: 3
