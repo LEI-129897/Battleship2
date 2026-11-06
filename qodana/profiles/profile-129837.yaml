@@ -1,0 +1,11 @@
+# 129837 - Ruben Fonseca
+name: LargeClassDetectionProfile
+inspections:
+  - inspection: ClassWithTooManyMethods
+    enabled: true
+    options:
+      m_limit: 15
+  - inspection: OverlyComplexClass
+    enabled: true
+    options:
+      m_limit: 47
