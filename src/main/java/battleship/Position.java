@@ -236,4 +236,5 @@ public class Position implements IPosition {
 		return (char) ('A' + row) + "" + (column + 1);
 //		return "Row = " + (char) ('A' + row) + ", Column = " + (column + 1);
 	}
+
 }
