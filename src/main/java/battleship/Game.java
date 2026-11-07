@@ -17,13 +17,13 @@ public class Game implements IGame
 	 *                    and their positions are shown according to their placement.
 	 * @param moves       the list of moves containing shots. If shot positions are shown,
 	 *                    they will be rendered based on their outcome (hit, miss, etc.).
-	 * @param showShots  if true, displays the shots taken during the game and marks
+	 * @param show_shots  if true, displays the shots taken during the game and marks
 	 *                    their result (hit or miss) on the board.
 	 * @param showLegend  if true, displays an explanatory legend of the symbols used
 	 *                    to represent various elements such as ships, misses, hits, etc.
 	 */
 	public static void printBoard(IFleet fleet, List<IMove> moves,
-								  boolean showShots, boolean showLegend) {
+								  boolean show_shots, boolean showLegend) {
 
 		assert fleet != null;
 		assert moves != null;
@@ -36,7 +36,7 @@ public class Game implements IGame
 
 		printShips(fleet, map);
 
-		if (showShots)
+		if (show_shots)
 			printBoardShots(moves, map);
 
 		printBoardFrame(map);
@@ -456,14 +456,14 @@ public class Game implements IGame
 		return false;
 	}
 
-	public void printMyBoard(boolean showShots, boolean showLegend)
+	public void printMyBoard(boolean show_shots, boolean showLegend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, showShots, showLegend);
+		Game.printBoard(this.myFleet, this.alienMoves, show_shots, showLegend);
 	}
 
-	public void printAlienBoard(boolean showShots, boolean showLegend)
+	public void printAlienBoard(boolean show_shots, boolean showLegend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, showShots, showLegend);
+		Game.printBoard(this.alienFleet, this.myMoves, show_shots, showLegend);
 	}
 
 	public void over() {
