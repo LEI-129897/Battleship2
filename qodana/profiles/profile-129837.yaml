@@ -2,11 +2,11 @@
 name: LargeClassDetectionProfile
 baseProfile: empty
 inspections:
-  - inspection: ClassWithTooManyMethods
+  - inspection: MethodCount
     enabled: true
     options:
       m_limit: 15
-  - inspection: OverlyComplexClass
+  - inspection: ClassComplexity
     enabled: true
     options:
       m_limit: 47
