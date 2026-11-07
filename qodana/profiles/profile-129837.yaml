@@ -5,7 +5,7 @@ inspections:
   - inspection: MethodCount
     enabled: true
     options:
-      m_limit: 15
+      m_limit: 14
   - inspection: ClassComplexity
     enabled: true
     options:
