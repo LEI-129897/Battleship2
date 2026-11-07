@@ -1,0 +1,21 @@
+# 129837 - Ruben Fonseca
+name: checkstyle quality gate
+on:
+  push:
+    branches: [ main, "129837" ]
+  pull_request:
+permissions: {}
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dbelyaev/action-checkstyle@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check
+          checkstyle_config: ./checkstyle-129837.xml
+          fail_level: error
