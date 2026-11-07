@@ -4,13 +4,12 @@ on:
   push:
     branches: [ main, "129837-2" ]
   pull_request:
-permissions: {}
+permissions:
+  contents: read
+  checks: write
 jobs:
   checkstyle:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      checks: write
     steps:
       - uses: actions/checkout@v7
       - uses: dbelyaev/action-checkstyle@v4
