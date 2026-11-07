@@ -1,5 +1,6 @@
 # 129837 - Ruben Fonseca
 name: LargeClassDetectionProfile
+baseProfile: empty
 inspections:
   - inspection: ClassWithTooManyMethods
     enabled: true
