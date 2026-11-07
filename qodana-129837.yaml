@@ -7,4 +7,4 @@ profile:
 failureConditions:
   severityThresholds:
     critical: 0
-    high: 3
+    high: 0
