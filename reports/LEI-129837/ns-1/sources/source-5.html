@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseManager (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85,7%
+  </span>
+  <span class="absValue">
+    (12/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.sql.Statement;
+&nbsp;
+&nbsp;public class DatabaseManager {
+&nbsp;    private static final String DB_URL = &quot;jdbc:sqlite:battleship_moves.db&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public DatabaseManager() {</b>
+<b class="fc">&nbsp;        initDatabase();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initDatabase() {
+<b class="fc">&nbsp;        String createTableSQL = &quot;CREATE TABLE IF NOT EXISTS moves (&quot;</b>
+&nbsp;                + &quot;id INTEGER PRIMARY KEY AUTOINCREMENT, &quot;
+&nbsp;                + &quot;timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, &quot;
+&nbsp;                + &quot;mode TEXT, &quot;
+&nbsp;                + &quot;remaining_ships INTEGER&quot;
+&nbsp;                + &quot;);&quot;;
+&nbsp;
+<b class="fc">&nbsp;        try (Connection conn = DriverManager.getConnection(DB_URL);</b>
+<b class="fc">&nbsp;             Statement stmt = conn.createStatement()) {</b>
+<b class="fc">&nbsp;            stmt.execute(createTableSQL);</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;Erro ao inicializar base de dados: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveMove(String mode, int remainingShips) {
+<b class="fc">&nbsp;        String insertSQL = &quot;INSERT INTO moves(mode, remaining_ships) VALUES(?, ?)&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;        try (Connection conn = DriverManager.getConnection(DB_URL);</b>
+<b class="fc">&nbsp;             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {</b>
+<b class="fc">&nbsp;            pstmt.setString(1, mode);</b>
+<b class="fc">&nbsp;            pstmt.setInt(2, remainingShips);</b>
+<b class="fc">&nbsp;            pstmt.executeUpdate();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;Erro ao guardar jogada: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-14 21:52</div>
+</div>
+</body>
+</html>
