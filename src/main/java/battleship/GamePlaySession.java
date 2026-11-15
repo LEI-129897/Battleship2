@@ -40,7 +40,8 @@ public class GamePlaySession {
     }
 
     public synchronized void beginMove() {
-        if (game != null && game.getRemainingShips() > 0 && !simulating && moveTimer == null) {
+        boolean b = game != null;
+        if (b && game.getRemainingShips() > 0 && !simulating && moveTimer == null) {
             moveTimer = StopWatch.createStarted();
         }
     }
