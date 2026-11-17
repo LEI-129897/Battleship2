@@ -408,10 +408,22 @@ public class Game implements IGame
 		{
 			ship.shoot(pos);
 			countHits++;
-			if (!ship.stillFloating()) {
+			boolean result = false;
+			for (int i = 0; i < ship.getSize(); i++)
+				if (!ship.getPositions().get(i).isHit()) {
+					result = true;
+					break;
+				}
+			if (!result) {
 				countSinks++;
 			}
-			return new ShotResult(true, false, ship, !ship.stillFloating());
+            boolean result1 = false;
+            for (int i = 0; i < ship.getSize(); i++)
+                if (!ship.getPositions().get(i).isHit()) {
+                    result1 = true;
+                    break;
+                }
+            return new ShotResult(true, false, ship, !result1);
 		}
 	}
 
