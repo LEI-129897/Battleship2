@@ -106,7 +106,7 @@ public class Move implements IMove {
 		String jsonString;
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = createObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		try {
@@ -175,15 +175,15 @@ public class Move implements IMove {
 					}
 				}
 
-				if (missedShots > 0) {
-					output.append(missedShots).append(" tiro").append(missedShots > 1 ? "s" : "").append(" na água");
+				if (result.missedShots() > 0) {
+					output.append(result.missedShots()).append(" tiro").append(result.missedShots() > 1 ? "s" : "").append(" na água");
 				} else if (!output.isEmpty()) {
 					output.setLength(output.length() - 2); // Remover o "+" final
 				}
 
-				if (repeatedShots > 0) {
+				if (result.repeatedShots() > 0) {
 					output.append(", ");
-					output.append(repeatedShots).append(" tiro").append(repeatedShots > 1 ? "s" : "").append(" repetido").append(repeatedShots > 1 ? "s" : "");
+					output.append(result.repeatedShots()).append(" tiro").append(result.repeatedShots() > 1 ? "s" : "").append(" repetido").append(result.repeatedShots() > 1 ? "s" : "");
 				}
 			}
 
@@ -207,24 +207,15 @@ public class Move implements IMove {
 				// Tiro inválido - apenas ignorar
 				continue;
 			}
-		}
-		response.put("hitsOnBoats", boatHits);
 
-		// Serializar o JSON utilizando Jackson
-		String jsonString;
-
-		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = createObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-			if (result.repeated())
+			if (result.repeated()) {
 				repeatedShots++; // tiro repetido
-			else {
+			} else {
 				// Tiro válido
 				validShots++;
 				if (result.ship() == null)
 					missedShots++; // Tiro na água
-				else{
+				else {
 					String boatName = result.ship().getCategory();
 					hitsPerBoat.put(boatName, hitsPerBoat.getOrDefault(boatName, 0) + 1);
 					if (result.sunk())
@@ -232,8 +223,7 @@ public class Move implements IMove {
 				}
 			}
 		}
-		Result result = new Result(validShots, repeatedShots, missedShots);
-		return result;
+		return new Result(validShots, repeatedShots, missedShots);
 	}
 
 	private record Result(int validShots, int repeatedShots, int missedShots) {
