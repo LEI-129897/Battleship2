@@ -11,3 +11,13 @@
 | Move.java::`processEnemyFire()` | Long Method                                     | Extract Method         | 129837           |
 | Galleon.java::`fillNorth()`    | Feature Envy - 'IPosition' accessed repeatedly   | Move Instance Method   | 129837           |
 | GamePlaySession.java::`beginMove()` | Complex Condition - if (...) {}             | Introduce Variable     | 129837           |
+| Position.java::`adjacentPositions()` | Repeated allocation of direction offsets      | Extract Constant       | 124790           |
+| Tasks.java::`readClassicPosition()` | Unreachable duplicate parsing branch         | Remove Dead Code       | 124790           |
+| Caravel.java::Construtor            | Duplicate branches in `switch`               | Consolidate Duplicate Branches | 124790 |
+| Fleet.java::`getFloatingShips()` / `getSunkShips()` | Duplicate filtering loops | Parameterize Method | 124790 |
+| Carrack.java / Frigate.java         | Duplicate position-generation methods        | Pull Up Method         | 124790           |
+| Tasks.java::`menu()`                | Busy wait - `Thread.sleep()` inside loop (Qodana: BusyWait) | Replace with Scheduled Execution | 124790 |
+| Game.java::`randomEnemyFire()`      | `Set.removeAll(List)` may be slow (Qodana: SlowAbstractSetRemoveAll, 2 occurrences) | Replace `removeAll` with iteration | 124790 |
+| Ship.java::`getTopMostPos()`        | Suspicious indentation after `if` (Qodana: SuspiciousIndentAfterControlStatement) | Add Braces / Reformat Code | 124790 |
+| Ship.java::`getRightMostPos()`      | Suspicious indentation after `if` (Qodana: SuspiciousIndentAfterControlStatement) | Add Braces / Reformat Code | 124790 |
+| Game.java::`jsonShots()`            | Redundant null initializer (Qodana: UnusedAssignment) | Remove Redundant Initialization | 124790 |
