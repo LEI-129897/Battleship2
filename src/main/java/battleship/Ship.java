@@ -115,6 +115,16 @@ public abstract class Ship implements IShip
 		setPositions(new ArrayList<>());
     }
 
+	protected void addHorizontalPositions(IPosition pos) {
+		for (int columnOffset = 0; columnOffset < getSize(); columnOffset++)
+			getPositions().add(new Position(pos.getRow(), pos.getColumn() + columnOffset));
+	}
+
+	protected void addVerticalPositions(IPosition pos) {
+		for (int rowOffset = 0; rowOffset < getSize(); rowOffset++)
+			getPositions().add(new Position(pos.getRow() + rowOffset, pos.getColumn()));
+	}
+
 	/**
 	 * Gets category.
 	 *
