@@ -222,7 +222,7 @@ public class Position implements IPosition {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(row, column, isOccupied, isHit);
+		return Objects.hash(row, column);
 	}
 
 	/**
