@@ -25,6 +25,13 @@ public class GamePlaySession {
         generation++;
     }
 
+    /** Checks simulation state and replaces the game under the session's own lock. */
+    public synchronized boolean startNewGame() {
+        if (simulating) return false;
+        setGame(new Game(Fleet.createRandom()));
+        return true;
+    }
+
     public synchronized boolean hasGame() {
         return game != null;
     }

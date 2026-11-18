@@ -261,10 +261,7 @@ public class GUI extends Application {
     }
 
     private void newGame() {
-        synchronized (session) {
-            if (session.snapshot().simulating()) return;
-            session.setGame(new Game(Fleet.createRandom()));
-        }
+        if (!session.startNewGame()) return;
         selected.clear();
         renderboard();
         session.beginMove();

@@ -117,6 +117,45 @@ class GamePlaySessionTest {
     }
 
     @Test
+    void newGameReplacesTheFleetAndClearsThePreviousMoveAndTimer() {
+        fire("A1", "B2", "C3");
+        session.beginMove();
+        GamePlaySession.BoardSnapshot previous = session.snapshot();
+
+        assertTrue(session.startNewGame());
+
+        GamePlaySession.BoardSnapshot board = session.snapshot();
+        assertFalse(session.isGame(game));
+        assertEquals(Fleet.FLEET_SIZE, board.remainingShips());
+        assertNotEquals(previous.generation(), board.generation());
+        assertEquals(1, board.nextMove());
+        assertNull(board.lastMove());
+        assertFalse(board.shots()[0][0]);
+        assertFalse(session.timerSnapshot().running());
+        session.beginMove();
+        assertTrue(session.timerSnapshot().running());
+    }
+
+    @Test
+    void newGameDuringSimulationPreservesTheCurrentGameAndHistory() {
+        fire("A1", "B2", "C3");
+        session.beginSimulation();
+        GamePlaySession.BoardSnapshot previous = session.snapshot();
+
+        assertFalse(session.startNewGame());
+
+        GamePlaySession.BoardSnapshot board = session.snapshot();
+        assertTrue(session.isGame(game));
+        assertTrue(board.simulating());
+        assertEquals(previous.generation(), board.generation());
+        assertEquals(previous.nextMove(), board.nextMove());
+        assertEquals(previous.remainingShips(), board.remainingShips());
+        assertEquals(previous.lastMove(), board.lastMove());
+        assertTrue(board.shots()[0][0]);
+        assertFalse(session.timerSnapshot().running());
+    }
+
+    @Test
     void finishingTheGamePreventsAdditionalMovesAndKeepsTheLastResult() {
         fire("A1", "B2", "C3");
         GamePlaySession.MoveReport last = fire("J10", "D4", "E5");
