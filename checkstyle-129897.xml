@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- 129897 - Pedro Figueiredo -->
+<module name="Checker">
+  <module name="TreeWalker">
+    <!-- Verifica se os nomes dos métodos seguem a convenção lowerCamelCase -->
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+    </module>
+  </module>
+</module>

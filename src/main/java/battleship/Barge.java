@@ -23,3 +23,4 @@ public class Barge extends Ship {
 		getPositions().add(new Position(pos.getRow(), pos.getColumn()));
 	}
 }
+

@@ -1,0 +1,34 @@
+# 124790 - Luís Pacheco
+name: Checkstyle naming gate 124790
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  checkstyle-124790:
+    name: checkstyle-124790
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check class and interface names
+        uses: dbelyaev/action-checkstyle@v3.12.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-124790.xml
+          checkstyle_version: '10.26.1'
+          workdir: src
+          reporter: github-check
+          level: error
+          filter_mode: nofilter
+          fail_level: error
+          reviewdog_flags: -name=checkstyle-typename-report-124790

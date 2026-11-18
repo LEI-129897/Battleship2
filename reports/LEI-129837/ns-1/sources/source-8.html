@@ -1,0 +1,440 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GUI</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: GUI (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GUI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/210)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import javafx.animation.Animation;
+&nbsp;import javafx.animation.KeyFrame;
+&nbsp;import javafx.animation.Timeline;
+&nbsp;import javafx.application.Application;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Region;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Stage;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/** Interactive board backed by the same session used by the console. */
+<b class="nc">&nbsp;public class GUI extends Application {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final AtomicBoolean LAUNCHED = new AtomicBoolean();</b>
+&nbsp;    private static volatile GUI instance;
+&nbsp;    private static volatile GamePlaySession session;
+&nbsp;    private static volatile boolean standalone;
+&nbsp;    private static volatile boolean closeRequested;
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;IPosition&gt; selected = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Button[][] cells = new Button[Game.BOARD_SIZE][Game.BOARD_SIZE];</b>
+<b class="nc">&nbsp;    private final Label turn = new Label();</b>
+<b class="nc">&nbsp;    private final Label fleet = new Label();</b>
+<b class="nc">&nbsp;    private final Label targets = new Label();</b>
+<b class="nc">&nbsp;    private final Label notice = new Label();</b>
+<b class="nc">&nbsp;    private final Label result = new Label();</b>
+<b class="nc">&nbsp;    private final Label elapsed = new Label();</b>
+<b class="nc">&nbsp;    private final Label currentElapsed = new Label();</b>
+&nbsp;    private Timeline timerUpdates;
+&nbsp;    private Button fire;
+&nbsp;    private Button clear;
+&nbsp;    private Button newGame;
+&nbsp;    private CheckBox showShips;
+&nbsp;    private Stage stage;
+<b class="nc">&nbsp;    private int generation = -1;</b>
+<b class="nc">&nbsp;    private int moveNumber = -1;</b>
+&nbsp;
+&nbsp;    public static void play() {
+<b class="nc">&nbsp;        standalone = true;</b>
+<b class="nc">&nbsp;        GamePlaySession game = new GamePlaySession();</b>
+<b class="nc">&nbsp;        game.setGame(new Game(Fleet.createRandom()));</b>
+<b class="nc">&nbsp;        display(game);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setGame(IGame game) {
+<b class="nc">&nbsp;        if (session == null || !session.isGame(game)) {</b>
+<b class="nc">&nbsp;            GamePlaySession replacement = new GamePlaySession();</b>
+<b class="nc">&nbsp;            replacement.setGame(game);</b>
+<b class="nc">&nbsp;            session = replacement;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void display(IGame game) {
+<b class="nc">&nbsp;        setGame(game);</b>
+<b class="nc">&nbsp;        display(session);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void display(GamePlaySession game) {
+<b class="nc">&nbsp;        session = Objects.requireNonNull(game);</b>
+<b class="nc">&nbsp;        if (LAUNCHED.compareAndSet(false, true)) {</b>
+<b class="nc">&nbsp;            Thread launcher = new Thread(() -&gt; Application.launch(GUI.class), &quot;battleship-gui-launcher&quot;);</b>
+<b class="nc">&nbsp;            launcher.start();</b>
+<b class="nc">&nbsp;        } else if (instance != null) {</b>
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;                instance.renderboard();</b>
+<b class="nc">&nbsp;                instance.stage.show();</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void close() {
+<b class="nc">&nbsp;        closeRequested = true;</b>
+<b class="nc">&nbsp;        if (instance != null) Platform.runLater(Platform::exit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start(Stage primaryStage) {
+<b class="nc">&nbsp;        stage = primaryStage;</b>
+<b class="nc">&nbsp;        Platform.setImplicitExit(standalone);</b>
+<b class="nc">&nbsp;        if (closeRequested) {</b>
+<b class="nc">&nbsp;            Platform.exit();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Label title = new Label(text(&quot;guiTitle&quot;));</b>
+<b class="nc">&nbsp;        title.getStyleClass().add(&quot;title&quot;);</b>
+<b class="nc">&nbsp;        Label subtitle = new Label(text(&quot;guiSelectShots&quot;, Game.NUMBER_SHOTS));</b>
+<b class="nc">&nbsp;        subtitle.getStyleClass().add(&quot;muted&quot;);</b>
+<b class="nc">&nbsp;        VBox header = new VBox(6, title, subtitle);</b>
+<b class="nc">&nbsp;        header.setPadding(new Insets(0, 0, 20, 0));</b>
+&nbsp;
+<b class="nc">&nbsp;        GridPane grid = new GridPane();</b>
+<b class="nc">&nbsp;        grid.setHgap(4);</b>
+<b class="nc">&nbsp;        grid.setVgap(4);</b>
+<b class="nc">&nbsp;        grid.setAlignment(Pos.TOP_LEFT);</b>
+<b class="nc">&nbsp;        for (int index = 0; index &lt; Game.BOARD_SIZE; index++) {</b>
+<b class="nc">&nbsp;            Label column = new Label(Integer.toString(index + 1));</b>
+<b class="nc">&nbsp;            column.getStyleClass().add(&quot;coordinate&quot;);</b>
+<b class="nc">&nbsp;            column.setMinWidth(38);</b>
+<b class="nc">&nbsp;            column.setAlignment(Pos.CENTER);</b>
+<b class="nc">&nbsp;            grid.add(column, index + 1, 0);</b>
+<b class="nc">&nbsp;            Label row = new Label(Character.toString((char) (&#39;A&#39; + index)));</b>
+<b class="nc">&nbsp;            row.getStyleClass().add(&quot;coordinate&quot;);</b>
+<b class="nc">&nbsp;            row.setMinWidth(22);</b>
+<b class="nc">&nbsp;            grid.add(row, 0, index + 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (int row = 0; row &lt; Game.BOARD_SIZE; row++) {</b>
+<b class="nc">&nbsp;            for (int column = 0; column &lt; Game.BOARD_SIZE; column++) {</b>
+<b class="nc">&nbsp;                IPosition position = new Position(row, column);</b>
+<b class="nc">&nbsp;                Button cell = new Button();</b>
+<b class="nc">&nbsp;                cell.setId(&quot;cell-&quot; + position);</b>
+<b class="nc">&nbsp;                cell.setPrefSize(38, 38);</b>
+<b class="nc">&nbsp;                cell.setMinSize(38, 38);</b>
+<b class="nc">&nbsp;                cell.setMaxSize(38, 38);</b>
+<b class="nc">&nbsp;                cell.setTooltip(new Tooltip(position.toString()));</b>
+<b class="nc">&nbsp;                cell.setOnAction(event -&gt; select(position));</b>
+<b class="nc">&nbsp;                cells[row][column] = cell;</b>
+<b class="nc">&nbsp;                grid.add(cell, column + 1, row + 1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        turn.getStyleClass().add(&quot;section-title&quot;);</b>
+<b class="nc">&nbsp;        fleet.getStyleClass().add(&quot;muted&quot;);</b>
+<b class="nc">&nbsp;        targets.setWrapText(true);</b>
+<b class="nc">&nbsp;        targets.setMinHeight(44);</b>
+<b class="nc">&nbsp;        notice.setWrapText(true);</b>
+<b class="nc">&nbsp;        notice.setMinHeight(48);</b>
+<b class="nc">&nbsp;        notice.getStyleClass().add(&quot;muted&quot;);</b>
+<b class="nc">&nbsp;        result.setWrapText(true);</b>
+<b class="nc">&nbsp;        result.setMinHeight(60);</b>
+<b class="nc">&nbsp;        elapsed.getStyleClass().add(&quot;time&quot;);</b>
+<b class="nc">&nbsp;        elapsed.setId(&quot;last-move-time&quot;);</b>
+<b class="nc">&nbsp;        currentElapsed.getStyleClass().add(&quot;time&quot;);</b>
+<b class="nc">&nbsp;        currentElapsed.setId(&quot;current-move-time&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        fire = new Button(text(&quot;guiFire&quot;, Game.NUMBER_SHOTS));</b>
+<b class="nc">&nbsp;        fire.setId(&quot;fire-shots&quot;);</b>
+<b class="nc">&nbsp;        fire.getStyleClass().add(&quot;primary&quot;);</b>
+<b class="nc">&nbsp;        fire.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        fire.setOnAction(event -&gt; fire());</b>
+<b class="nc">&nbsp;        clear = new Button(text(&quot;guiClear&quot;));</b>
+<b class="nc">&nbsp;        clear.setId(&quot;clear-selection&quot;);</b>
+<b class="nc">&nbsp;        clear.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        clear.setOnAction(event -&gt; {</b>
+<b class="nc">&nbsp;            selected.clear();</b>
+<b class="nc">&nbsp;            renderboard();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        newGame = new Button(text(&quot;guiNewGame&quot;));</b>
+<b class="nc">&nbsp;        newGame.setId(&quot;new-game&quot;);</b>
+<b class="nc">&nbsp;        newGame.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;        newGame.setOnAction(event -&gt; newGame());</b>
+<b class="nc">&nbsp;        showShips = new CheckBox(text(&quot;guiShowShips&quot;));</b>
+<b class="nc">&nbsp;        showShips.setSelected(true);</b>
+<b class="nc">&nbsp;        showShips.setOnAction(event -&gt; renderboard());</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox controls = new VBox(8, turn, fleet, new Label(text(&quot;guiCurrentMove&quot;)), currentElapsed,</b>
+&nbsp;                targets, fire, clear, notice, newGame, showShips,
+<b class="nc">&nbsp;                new Label(text(&quot;guiLastMove&quot;)), result, elapsed);</b>
+<b class="nc">&nbsp;        controls.getStyleClass().add(&quot;panel&quot;);</b>
+<b class="nc">&nbsp;        controls.setPrefWidth(224);</b>
+<b class="nc">&nbsp;        controls.setMinWidth(224);</b>
+<b class="nc">&nbsp;        controls.setMaxWidth(224);</b>
+<b class="nc">&nbsp;        HBox boardAndControls = new HBox(24, grid, controls);</b>
+<b class="nc">&nbsp;        HBox legend = new HBox(20, legend(&quot;cell-ship&quot;, &quot;guiShip&quot;), legend(&quot;cell-hit&quot;, &quot;guiHit&quot;),</b>
+<b class="nc">&nbsp;                legend(&quot;cell-miss&quot;, &quot;guiMiss&quot;), legend(&quot;cell-selected&quot;, &quot;guiSelected&quot;));</b>
+<b class="nc">&nbsp;        legend.setPadding(new Insets(20, 0, 0, 0));</b>
+<b class="nc">&nbsp;        BorderPane root = new BorderPane();</b>
+<b class="nc">&nbsp;        root.setPadding(new Insets(24));</b>
+<b class="nc">&nbsp;        root.setTop(header);</b>
+<b class="nc">&nbsp;        root.setCenter(boardAndControls);</b>
+<b class="nc">&nbsp;        root.setBottom(legend);</b>
+<b class="nc">&nbsp;        Scene scene = new Scene(root, 740, 780);</b>
+<b class="nc">&nbsp;        scene.getStylesheets().add(Objects.requireNonNull(GUI.class.getResource(&quot;gui.css&quot;)).toExternalForm());</b>
+<b class="nc">&nbsp;        stage.setTitle(text(&quot;guiTitle&quot;));</b>
+<b class="nc">&nbsp;        stage.setScene(scene);</b>
+<b class="nc">&nbsp;        stage.setMinWidth(740);</b>
+<b class="nc">&nbsp;        stage.setMinHeight(780);</b>
+<b class="nc">&nbsp;        timerUpdates = new Timeline(new KeyFrame(Duration.millis(100), event -&gt; refreshTimer()));</b>
+<b class="nc">&nbsp;        timerUpdates.setCycleCount(Animation.INDEFINITE);</b>
+<b class="nc">&nbsp;        stage.setOnShown(event -&gt; {</b>
+<b class="nc">&nbsp;            refreshTimer();</b>
+<b class="nc">&nbsp;            timerUpdates.play();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        stage.setOnHidden(event -&gt; timerUpdates.stop());</b>
+<b class="nc">&nbsp;        if (!standalone) {</b>
+<b class="nc">&nbsp;            stage.setOnCloseRequest(event -&gt; {</b>
+<b class="nc">&nbsp;                event.consume();</b>
+<b class="nc">&nbsp;                stage.hide();</b>
+&nbsp;            });
+&nbsp;        }
+<b class="nc">&nbsp;        instance = this;</b>
+<b class="nc">&nbsp;        renderboard();</b>
+<b class="nc">&nbsp;        stage.show();</b>
+<b class="nc">&nbsp;        session.beginMove();</b>
+<b class="nc">&nbsp;        refreshTimer();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void stop() {
+<b class="nc">&nbsp;        if (timerUpdates != null) timerUpdates.stop();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static HBox legend(String style, String key) {
+<b class="nc">&nbsp;        Region swatch = new Region();</b>
+<b class="nc">&nbsp;        swatch.getStyleClass().addAll(&quot;swatch&quot;, style);</b>
+<b class="nc">&nbsp;        swatch.setPrefSize(12, 12);</b>
+<b class="nc">&nbsp;        Label label = new Label(text(key));</b>
+<b class="nc">&nbsp;        label.getStyleClass().add(&quot;muted&quot;);</b>
+<b class="nc">&nbsp;        HBox item = new HBox(7, swatch, label);</b>
+<b class="nc">&nbsp;        item.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="nc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void select(IPosition position) {
+<b class="nc">&nbsp;        GamePlaySession.BoardSnapshot board = session.snapshot();</b>
+<b class="nc">&nbsp;        if (board.generation() != generation || board.nextMove() != moveNumber) renderboard();</b>
+<b class="nc">&nbsp;        if (board.finished() || board.simulating() || board.shots()[position.getRow()][position.getColumn()]) return;</b>
+<b class="nc">&nbsp;        if (selected.contains(position)) {</b>
+<b class="nc">&nbsp;            selected.remove(position);</b>
+<b class="nc">&nbsp;        } else if (selected.size() &lt; Game.NUMBER_SHOTS) {</b>
+<b class="nc">&nbsp;            selected.add(position);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        renderboard();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fire() {
+&nbsp;        try {
+<b class="nc">&nbsp;            session.fire(List.copyOf(selected), generation, moveNumber);</b>
+<b class="nc">&nbsp;            selected.clear();</b>
+<b class="nc">&nbsp;            session.withGame(game -&gt; {</b>
+<b class="nc">&nbsp;                game.getMyFleet().printStatus();</b>
+<b class="nc">&nbsp;                game.printMyBoard(true, false);</b>
+<b class="nc">&nbsp;                if (game.getRemainingShips() == 0) game.over();</b>
+&nbsp;            });
+<b class="nc">&nbsp;            renderboard();</b>
+<b class="nc">&nbsp;            session.beginMove();</b>
+<b class="nc">&nbsp;            refreshTimer();</b>
+&nbsp;        } catch (IllegalArgumentException | IllegalStateException exception) {
+<b class="nc">&nbsp;            renderboard();</b>
+<b class="nc">&nbsp;            notice.setText(exception.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void newGame() {
+<b class="nc">&nbsp;        synchronized (session) {</b>
+<b class="nc">&nbsp;            if (session.snapshot().simulating()) return;</b>
+<b class="nc">&nbsp;            session.setGame(new Game(Fleet.createRandom()));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        selected.clear();</b>
+<b class="nc">&nbsp;        renderboard();</b>
+<b class="nc">&nbsp;        session.beginMove();</b>
+<b class="nc">&nbsp;        refreshTimer();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void renderboard() {
+<b class="nc">&nbsp;        GamePlaySession.BoardSnapshot board = session.snapshot();</b>
+<b class="nc">&nbsp;        if (generation != board.generation() || moveNumber != board.nextMove()) selected.clear();</b>
+<b class="nc">&nbsp;        generation = board.generation();</b>
+<b class="nc">&nbsp;        moveNumber = board.nextMove();</b>
+<b class="nc">&nbsp;        boolean playable = board.hasGame() &amp;&amp; !board.finished() &amp;&amp; !board.simulating();</b>
+<b class="nc">&nbsp;        for (int row = 0; row &lt; Game.BOARD_SIZE; row++) {</b>
+<b class="nc">&nbsp;            for (int column = 0; column &lt; Game.BOARD_SIZE; column++) {</b>
+<b class="nc">&nbsp;                IPosition position = new Position(row, column);</b>
+<b class="nc">&nbsp;                Button cell = cells[row][column];</b>
+<b class="nc">&nbsp;                boolean shot = board.shots()[row][column];</b>
+<b class="nc">&nbsp;                boolean ship = board.ships()[row][column];</b>
+<b class="nc">&nbsp;                int selectedIndex = selected.indexOf(position);</b>
+<b class="nc">&nbsp;                String style = shot ? (ship ? &quot;cell-hit&quot; : &quot;cell-miss&quot;)</b>
+<b class="nc">&nbsp;                        : selectedIndex &gt;= 0 ? &quot;cell-selected&quot; : ship &amp;&amp; showShips.isSelected() ? &quot;cell-ship&quot; : &quot;cell-water&quot;;</b>
+<b class="nc">&nbsp;                cell.getStyleClass().setAll(&quot;board-cell&quot;, style);</b>
+<b class="nc">&nbsp;                cell.setText(shot ? (ship ? &quot;×&quot; : &quot;•&quot;) : selectedIndex &gt;= 0 ? Integer.toString(selectedIndex + 1) : &quot;&quot;);</b>
+<b class="nc">&nbsp;                cell.setDisable(!playable || shot);</b>
+<b class="nc">&nbsp;                cell.setAccessibleText(position + (shot ? &quot; — &quot; + text(ship ? &quot;guiHit&quot; : &quot;guiMiss&quot;) : &quot;&quot;));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        turn.setText(text(&quot;guiTurn&quot;, board.nextMove()));</b>
+<b class="nc">&nbsp;        fleet.setText(text(&quot;guiRemaining&quot;, board.remainingShips()));</b>
+<b class="nc">&nbsp;        String coordinates = selected.stream().map(Object::toString).collect(Collectors.joining(&quot;  &quot;));</b>
+<b class="nc">&nbsp;        targets.setText(text(&quot;guiTargets&quot;, selected.size(), Game.NUMBER_SHOTS) + &quot;\n&quot; + coordinates);</b>
+<b class="nc">&nbsp;        fire.setDisable(!playable || selected.size() != Game.NUMBER_SHOTS);</b>
+<b class="nc">&nbsp;        clear.setDisable(selected.isEmpty());</b>
+<b class="nc">&nbsp;        newGame.setDisable(board.simulating());</b>
+<b class="nc">&nbsp;        notice.setText(text(board.finished() ? &quot;guiFinished&quot; : board.simulating() ? &quot;guiSimulating&quot;</b>
+<b class="nc">&nbsp;                : selected.size() == Game.NUMBER_SHOTS ? &quot;guiReady&quot; : &quot;guiSelectShots&quot;, Game.NUMBER_SHOTS));</b>
+<b class="nc">&nbsp;        GamePlaySession.MoveReport report = board.lastMove();</b>
+<b class="nc">&nbsp;        if (report == null) {</b>
+<b class="nc">&nbsp;            result.setText(text(&quot;guiNoMoves&quot;));</b>
+<b class="nc">&nbsp;            elapsed.setText(&quot;—&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            result.setText(text(&quot;guiResult&quot;, report.number(), report.hits(), report.misses(), report.sunk()));</b>
+<b class="nc">&nbsp;            elapsed.setText(text(&quot;guiTime&quot;, String.format(Locale.ROOT, &quot;%.3f&quot;, report.seconds())));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        refreshTimer();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void refreshTimer() {
+<b class="nc">&nbsp;        GamePlaySession.TimerSnapshot timer = session.timerSnapshot();</b>
+<b class="nc">&nbsp;        currentElapsed.setText(timer.running()</b>
+<b class="nc">&nbsp;                ? text(&quot;guiTime&quot;, String.format(Locale.ROOT, &quot;%.3f&quot;, timer.seconds())) : &quot;—&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String text(String key, Object... arguments) {
+<b class="nc">&nbsp;        return GestorIdioma.getMensagemFormatada(key, arguments);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-14 21:52</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# 124790 - Luís Pacheco
+name: "profile-124790"
+baseProfile: empty
+inspections:
+  - inspection: ParametersPerMethod
+    enabled: true
+    options:
+      m_limit: 5

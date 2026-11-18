@@ -186,4 +186,94 @@ import java.util.ArrayList;
 			fleet.addShip(ship);
 			assertDoesNotThrow(fleet::printStatus, "Error: printStatus should not throw any exceptions.");
 		}
+
+		/**
+		 * Test for getSunkShips (Path 1: initially empty / branch false).
+		 * Cyclomatic Complexity: 2
+		 */
+		@Test
+		@DisplayName("Test getSunkShips - Initially Empty")
+		void testGetSunkShips1() {
+			IShip ship = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship);
+			assertTrue(fleet.getSunkShips().isEmpty(), "Error: Sunk ships should be empty initially.");
+		}
+
+		/**
+		 * Test for getSunkShips (Path 2: with sunk ships / branch true).
+		 * Cyclomatic Complexity: 2
+		 */
+		@Test
+		@DisplayName("Test getSunkShips - With Sunk Ships")
+		void testGetSunkShips2() {
+			IShip ship = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship);
+			ship.getPositions().get(0).shoot();
+
+			List<IShip> sunk = fleet.getSunkShips();
+			assertAll("Sunk ships checks",
+					() -> assertEquals(1, sunk.size(), "Error: Should have one sunk ship."),
+					() -> assertEquals(ship, sunk.get(0), "Error: Sunk ship instance should match.")
+			);
+		}
+
+		/**
+		 * Test for getShipsLike (Path 2: category not found / branch false).
+		 * Cyclomatic Complexity: 2
+		 */
+		@Test
+		@DisplayName("Test getShipsLike - Category Not Found")
+		void testGetShipsLike2() {
+			IShip ship1 = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship1);
+
+			List<IShip> results = fleet.getShipsLike("Galeao");
+			assertTrue(results.isEmpty(), "Error: Should return empty list for non-existent category.");
+		}
+
+		/**
+		 * Test for printAllShips.
+		 * Cyclomatic Complexity: 1
+		 */
+		@Test
+		@DisplayName("Test printAllShips")
+		void testPrintAllShips() {
+			IShip ship = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship);
+			assertDoesNotThrow(() -> fleet.printAllShips(), "Error: printAllShips should not throw exceptions.");
+		}
+
+		/**
+		 * Test for printFloatingShips.
+		 * Cyclomatic Complexity: 1
+		 */
+		@Test
+		@DisplayName("Test printFloatingShips")
+		void testPrintFloatingShips() {
+			IShip ship = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship);
+			assertDoesNotThrow(() -> fleet.printFloatingShips(), "Error: printFloatingShips should not throw exceptions.");
+		}
+
+		/**
+		 * Test for printShipsByCategory (Path 1: valid category).
+		 * Cyclomatic Complexity: 2
+		 */
+		@Test
+		@DisplayName("Test printShipsByCategory - Valid")
+		void testPrintShipsByCategory1() {
+			IShip ship = new Barge(Compass.NORTH, new Position(1, 1));
+			fleet.addShip(ship);
+			assertDoesNotThrow(() -> fleet.printShipsByCategory("Barca"), "Error: printShipsByCategory should not throw exceptions.");
+		}
+
+		/**
+		 * Test for printShipsByCategory (Path 2: non-existent category).
+		 * Cyclomatic Complexity: 2
+		 */
+		@Test
+		@DisplayName("Test printShipsByCategory - Non-existent")
+		void testPrintShipsByCategory2() {
+			assertDoesNotThrow(() -> fleet.printShipsByCategory("Inexistente"), "Error: printShipsByCategory should handle missing category safely.");
+		}
 	}

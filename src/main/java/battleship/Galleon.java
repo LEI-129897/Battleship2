@@ -22,7 +22,7 @@ public class Galleon extends Ship {
 
 		switch (bearing) {
 			case NORTH:
-				fillNorth(pos);
+				pos.fillNorth(this);
 				break;
 			case EAST:
 				fillEast(pos);
@@ -34,19 +34,6 @@ public class Galleon extends Ship {
 				fillWest(pos);
 				break;
 		}
-	}
-
-	/**
-	 * Fills the positions of the Galleon when oriented to the NORTH.
-	 *
-	 * @param pos The initial position of the ship.
-	 */
-	private void fillNorth(IPosition pos) {
-		for (int i = 0; i < 3; i++) {
-			getPositions().add(new Position(pos.getRow(), pos.getColumn() + i));
-		}
-		getPositions().add(new Position(pos.getRow() + 1, pos.getColumn() + 1));
-		getPositions().add(new Position(pos.getRow() + 2, pos.getColumn() + 1));
 	}
 
 	/**
