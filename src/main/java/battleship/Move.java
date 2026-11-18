@@ -28,6 +28,10 @@ public class Move implements IMove {
 		this.shotResults = moveResults;
 	}
 
+	protected ObjectMapper createObjectMapper() {
+		return new ObjectMapper();
+	}
+
 	@Override
 	public String toString() {
 		return "Move{" +
@@ -102,7 +106,7 @@ public class Move implements IMove {
 		String jsonString;
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = createObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		try {
@@ -173,14 +177,12 @@ public class Move implements IMove {
 
 				if (result.missedShots() > 0) {
 					output.append(result.missedShots()).append(" tiro").append(result.missedShots() > 1 ? "s" : "").append(" na água");
-				} else if (!sunkBoatsCount.isEmpty() || !hitsPerBoat.isEmpty()) {
+				} else if (!output.isEmpty()) {
 					output.setLength(output.length() - 2); // Remover o "+" final
 				}
 
 				if (result.repeatedShots() > 0) {
-					if (result.validShots() > 0) {
-						output.append(", ");
-					}
+					output.append(", ");
 					output.append(result.repeatedShots()).append(" tiro").append(result.repeatedShots() > 1 ? "s" : "").append(" repetido").append(result.repeatedShots() > 1 ? "s" : "");
 				}
 			}
@@ -206,14 +208,14 @@ public class Move implements IMove {
 				continue;
 			}
 
-			if (result.repeated())
+			if (result.repeated()) {
 				repeatedShots++; // tiro repetido
-			else {
+			} else {
 				// Tiro válido
 				validShots++;
 				if (result.ship() == null)
 					missedShots++; // Tiro na água
-				else{
+				else {
 					String boatName = result.ship().getCategory();
 					hitsPerBoat.put(boatName, hitsPerBoat.getOrDefault(boatName, 0) + 1);
 					if (result.sunk())
@@ -221,8 +223,7 @@ public class Move implements IMove {
 				}
 			}
 		}
-		Result result = new Result(validShots, repeatedShots, missedShots);
-		return result;
+		return new Result(validShots, repeatedShots, missedShots);
 	}
 
 	private record Result(int validShots, int repeatedShots, int missedShots) {
