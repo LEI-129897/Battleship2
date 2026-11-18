@@ -27,6 +27,10 @@ public class Move implements IMove {
 		this.shotResults = moveResults;
 	}
 
+	protected ObjectMapper createObjectMapper() {
+		return new ObjectMapper();
+	}
+
 	@Override
 	public String toString() {
 		return "Move{" +
@@ -130,14 +134,12 @@ public class Move implements IMove {
 
 				if (missedShots > 0) {
 					output.append(missedShots).append(" tiro").append(missedShots > 1 ? "s" : "").append(" na água");
-				} else if (!sunkBoatsCount.isEmpty() || !hitsPerBoat.isEmpty()) {
+				} else if (!output.isEmpty()) {
 					output.setLength(output.length() - 2); // Remover o "+" final
 				}
 
 				if (repeatedShots > 0) {
-					if (validShots > 0) {
-						output.append(", ");
-					}
+					output.append(", ");
 					output.append(repeatedShots).append(" tiro").append(repeatedShots > 1 ? "s" : "").append(" repetido").append(repeatedShots > 1 ? "s" : "");
 				}
 			}
@@ -187,7 +189,7 @@ public class Move implements IMove {
 		String jsonString;
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = createObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		try {
