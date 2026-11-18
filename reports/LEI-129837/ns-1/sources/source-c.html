@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GestorIdioma</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: GestorIdioma (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GestorIdioma</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98,4%
+  </span>
+  <span class="absValue">
+    (120/122)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.ibm.icu.text.MessageFormat;
+&nbsp;import com.ibm.icu.util.ULocale;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+<b class="nc">&nbsp;public class GestorIdioma {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static ULocale idioma = ULocale.forLanguageTag(&quot;pt&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, String&gt; mensagensPT = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static final Map&lt;String, String&gt; mensagensEN = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+&nbsp;        // Português
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdAjuda&quot;, &quot;ajuda&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdGeraFrota&quot;, &quot;gerafrota&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdLeFrota&quot;, &quot;lefrota&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdDesistir&quot;, &quot;desisto&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdRajada&quot;, &quot;rajada&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdTiros&quot;, &quot;tiros&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdMapa&quot;, &quot;mapa&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdEstado&quot;, &quot;estado&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;cmdSimula&quot;, &quot;simula&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;despedida&quot;, &quot;Bons ventos!&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;comandoInvalido&quot;, &quot;Que comando é esse??? Repete ...&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;ajudaTitulo&quot;, &quot;======================= AJUDA DO MENU =========================&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;ajudaIntroducao&quot;, &quot;Digite um dos comandos abaixo para interagir com o jogo:&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;geraFrota&quot;, &quot;Gera uma frota aleatória de navios.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;leFrota&quot;, &quot;Permite criar e carregar uma frota personalizada.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;estado&quot;, &quot;Mostra o estado atual da frota.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;mapa&quot;, &quot;Exibe o mapa da frota.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;rajada&quot;, &quot;Realiza uma rajada de disparos.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;simula&quot;, &quot;Simula um jogo completo.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;tiros&quot;, &quot;Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água).&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;desistir&quot;, &quot;Encerra o jogo.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;ajudaFim&quot;, &quot;===============================================================&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;legenda&quot;, &quot;LEGENDA&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;navio&quot;, &quot;navio&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;adjacenteNavio&quot;, &quot;adjacente a navio&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;agua&quot;, &quot;água&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;tiroCerteiro&quot;, &quot;tiro certeiro&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;tiroAgua&quot;, &quot;tiro na água&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;posicaoIncompleta&quot;, &quot;Posição incompleta! A coluna&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;numeroPosicoes&quot;, &quot;Deve inserir exatamente {0} posições!&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;numeroTiros&quot;, &quot;Deve disparar exatamente {0} tiros por jogada.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;fimJogo&quot;, &quot;Maldito sejas, Java Sparrow, eu voltarei!&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiTitle&quot;, &quot;Batalha naval&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiSelectShots&quot;, &quot;Selecione {0} casas diferentes e dispare a rajada.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiFire&quot;, &quot;Disparar {0} tiros&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiClear&quot;, &quot;Limpar seleção&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiNewGame&quot;, &quot;Nova partida&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiShowShips&quot;, &quot;Mostrar navios&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiTurn&quot;, &quot;Jogada nº{0}&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiRemaining&quot;, &quot;Navios a flutuar: {0}&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiTargets&quot;, &quot;Alvos selecionados: {0}/{1}&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiCurrentMove&quot;, &quot;TEMPO DA JOGADA ATUAL&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiLastMove&quot;, &quot;ÚLTIMA JOGADA&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiNoMoves&quot;, &quot;Os resultados aparecerão aqui depois de disparar.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiResult&quot;, &quot;Jogada nº{0}\nAcertos: {1} · Água: {2}\nNavios afundados: {3}&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiTime&quot;, &quot;{0} s&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiReady&quot;, &quot;Tudo pronto! Dispare ou clique num alvo para alterar a seleção.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiFinished&quot;, &quot;Todos os navios foram afundados. Inicie uma nova partida.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiSimulating&quot;, &quot;Simulação em curso. Aguarde antes de jogar.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiMoveChanged&quot;, &quot;A partida ou a jogada mudou. Selecione os alvos novamente.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiAlreadyShot&quot;, &quot;Escolha casas diferentes que ainda não tenham sido atingidas.&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiShip&quot;, &quot;Navio&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiHit&quot;, &quot;Acerto&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiMiss&quot;, &quot;Água&quot;);</b>
+<b class="fc">&nbsp;        mensagensPT.put(&quot;guiSelected&quot;, &quot;Selecionado&quot;);</b>
+&nbsp;
+&nbsp;        // Inglês
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdAjuda&quot;, &quot;help&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdGeraFrota&quot;, &quot;randomfleet&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdLeFrota&quot;, &quot;loadfleet&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdDesistir&quot;, &quot;quit&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdRajada&quot;, &quot;fire&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdTiros&quot;, &quot;shots&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdMapa&quot;, &quot;map&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdEstado&quot;, &quot;status&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;cmdSimula&quot;, &quot;simulate&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;despedida&quot;, &quot;Fair winds!&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;comandoInvalido&quot;, &quot;What kind of command is that??? Try again ...&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;ajudaTitulo&quot;, &quot;======================= MENU HELP =========================&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;ajudaIntroducao&quot;, &quot;Enter one of the following commands to interact with the game:&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;geraFrota&quot;, &quot;Generates a random fleet of ships.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;leFrota&quot;, &quot;Allows you to create and load a custom fleet.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;estado&quot;, &quot;Shows the current fleet status.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;mapa&quot;, &quot;Displays the fleet map.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;rajada&quot;, &quot;Performs a burst of shots.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;simula&quot;, &quot;Simulates a complete game.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;tiros&quot;, &quot;Lists valid shots (* = hit a ship, o = hit water).&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;desistir&quot;, &quot;Ends the game.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;ajudaFim&quot;, &quot;===============================================================&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;legenda&quot;, &quot;LEGEND&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;navio&quot;, &quot;ship&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;adjacenteNavio&quot;, &quot;adjacent to a ship&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;agua&quot;, &quot;water&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;tiroCerteiro&quot;, &quot;hit&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;tiroAgua&quot;, &quot;miss&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;posicaoIncompleta&quot;, &quot;Incomplete position! Column&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;numeroPosicoes&quot;, &quot;You must enter exactly {0} positions!&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;numeroTiros&quot;, &quot;You must fire exactly {0} shots per move.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;fimJogo&quot;, &quot;Damn you, Java Sparrow, I will return!&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiTitle&quot;, &quot;Battleship&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiSelectShots&quot;, &quot;Select {0} different cells, then fire your shots.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiFire&quot;, &quot;Fire {0} shots&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiClear&quot;, &quot;Clear selection&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiNewGame&quot;, &quot;New game&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiShowShips&quot;, &quot;Show ships&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiTurn&quot;, &quot;Move #{0}&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiRemaining&quot;, &quot;Ships remaining: {0}&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiTargets&quot;, &quot;Selected targets: {0}/{1}&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiCurrentMove&quot;, &quot;CURRENT MOVE TIME&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiLastMove&quot;, &quot;LAST MOVE&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiNoMoves&quot;, &quot;Your results will appear here after you fire.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiResult&quot;, &quot;Move #{0}\nHits: {1} · Water: {2}\nShips sunk: {3}&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiTime&quot;, &quot;{0} s&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiReady&quot;, &quot;Ready to fire! Click a target again to change your selection.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiFinished&quot;, &quot;All ships have been sunk. Start a new game to play again.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiSimulating&quot;, &quot;Simulation in progress. Please wait before playing.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiMoveChanged&quot;, &quot;The game or move changed. Select your targets again.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiAlreadyShot&quot;, &quot;Choose different cells that have not already been fired at.&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiShip&quot;, &quot;Ship&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiHit&quot;, &quot;Hit&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiMiss&quot;, &quot;Water&quot;);</b>
+<b class="fc">&nbsp;        mensagensEN.put(&quot;guiSelected&quot;, &quot;Selected&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setIdioma(String codigoIdioma) {
+<b class="fc">&nbsp;        idioma = ULocale.forLanguageTag(codigoIdioma);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getMensagem(String chave) {
+&nbsp;
+&nbsp;        Map&lt;String, String&gt; mensagens;
+&nbsp;
+<b class="pc">&nbsp;        if (idioma.getLanguage().equals(&quot;en&quot;)) {</b>
+<b class="nc">&nbsp;            mensagens = mensagensEN;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            mensagens = mensagensPT;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return mensagens.getOrDefault(chave, chave);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getMensagemFormatada(
+&nbsp;            String chave, Object... parametros) {
+&nbsp;
+<b class="fc">&nbsp;        String mensagem = getMensagem(chave);</b>
+&nbsp;
+<b class="fc">&nbsp;        MessageFormat formato = new MessageFormat(mensagem, idioma);</b>
+&nbsp;
+<b class="fc">&nbsp;        return formato.format(parametros);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-14 21:52</div>
+</div>
+</body>
+</html>

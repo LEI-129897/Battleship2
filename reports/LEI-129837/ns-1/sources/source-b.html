@@ -1,0 +1,372 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GamePlaySession</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: GamePlaySession (battleship)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GamePlaySession</td>
+<td class="coverageStat">
+  <span class="percent">
+    87,5%
+  </span>
+  <span class="absValue">
+    (14/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79,2%
+  </span>
+  <span class="absValue">
+    (57/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,1%
+  </span>
+  <span class="absValue">
+    (73/76)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GamePlaySession$BoardSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GamePlaySession$MoveReport</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GamePlaySession$TimerSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (18/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78,4%
+  </span>
+  <span class="absValue">
+    (58/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,2%
+  </span>
+  <span class="absValue">
+    (77/80)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.time.StopWatch;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Scanner;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;/** Shares game state and the decision timer between the terminal and JavaFX. */
+<b class="fc">&nbsp;public class GamePlaySession {</b>
+&nbsp;
+&nbsp;    private IGame game;
+&nbsp;    private StopWatch moveTimer;
+&nbsp;    private MoveReport lastMove;
+&nbsp;    private int generation;
+&nbsp;    private boolean simulating;
+&nbsp;
+&nbsp;    public synchronized void setGame(IGame game) {
+<b class="fc">&nbsp;        this.game = Objects.requireNonNull(game);</b>
+<b class="fc">&nbsp;        moveTimer = null;</b>
+<b class="fc">&nbsp;        lastMove = null;</b>
+<b class="fc">&nbsp;        simulating = false;</b>
+<b class="fc">&nbsp;        generation++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized boolean hasGame() {
+<b class="fc">&nbsp;        return game != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized boolean isGame(IGame candidate) {
+<b class="nc">&nbsp;        return game == candidate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void withGame(Consumer&lt;IGame&gt; action) {
+<b class="pc">&nbsp;        if (game != null) {</b>
+<b class="fc">&nbsp;            action.accept(game);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void beginMove() {
+<b class="pc">&nbsp;        if (game != null &amp;&amp; game.getRemainingShips() &gt; 0 &amp;&amp; !simulating &amp;&amp; moveTimer == null) {</b>
+<b class="fc">&nbsp;            moveTimer = StopWatch.createStarted();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Reads the live stopwatch without stopping or restarting the current move. */
+&nbsp;    public synchronized TimerSnapshot timerSnapshot() {
+<b class="pc">&nbsp;        boolean running = moveTimer != null &amp;&amp; moveTimer.isStarted() &amp;&amp; !moveTimer.isStopped();</b>
+<b class="fc">&nbsp;        double seconds = running ? moveTimer.getDuration().toNanos() / 1_000_000_000.0 : 0;</b>
+<b class="fc">&nbsp;        return new TimerSnapshot(seconds, running);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Submits GUI coordinates atomically, including validation of stale selections. */
+&nbsp;    public synchronized MoveReport fire(List&lt;IPosition&gt; shots, int expectedGeneration, int expectedMove) {
+<b class="fc">&nbsp;        ensurePlayable();</b>
+<b class="fc">&nbsp;        if (generation != expectedGeneration || game.getAlienMoves().size() + 1 != expectedMove) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(GestorIdioma.getMensagem(&quot;guiMoveChanged&quot;));</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (shots == null || shots.size() != Game.NUMBER_SHOTS</b>
+<b class="pc">&nbsp;                || shots.stream().anyMatch(position -&gt; position == null || !position.isInside())) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(GestorIdioma.getMensagemFormatada(&quot;guiSelectShots&quot;, Game.NUMBER_SHOTS));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (int index = 0; index &lt; shots.size(); index++) {</b>
+<b class="fc">&nbsp;            IPosition position = shots.get(index);</b>
+<b class="fc">&nbsp;            if (shots.subList(0, index).contains(position)</b>
+<b class="fc">&nbsp;                    || game.getAlienMoves().stream().anyMatch(move -&gt; move.getShots().contains(position))) {</b>
+<b class="fc">&nbsp;                throw new IllegalArgumentException(GestorIdioma.getMensagem(&quot;guiAlreadyShot&quot;));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        List&lt;IPosition&gt; submittedShots = List.copyOf(shots);</b>
+<b class="fc">&nbsp;        return submit(() -&gt; game.fireShots(submittedShots));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Keeps the terminal&#39;s existing parser and repeated/outside shot rules. */
+&nbsp;    public synchronized MoveReport fire(String input) {
+<b class="fc">&nbsp;        ensurePlayable();</b>
+<b class="fc">&nbsp;        return submit(() -&gt; {</b>
+<b class="fc">&nbsp;            try (Scanner scanner = new Scanner(input + &quot;\n&quot;)) {</b>
+<b class="fc">&nbsp;                game.readEnemyFire(scanner);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void ensurePlayable() {
+<b class="pc">&nbsp;        if (game == null || game.getRemainingShips() == 0) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(GestorIdioma.getMensagem(&quot;guiFinished&quot;));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (simulating) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(GestorIdioma.getMensagem(&quot;guiSimulating&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private MoveReport submit(Runnable fire) {
+<b class="fc">&nbsp;        beginMove();</b>
+<b class="fc">&nbsp;        moveTimer.stop();</b>
+<b class="fc">&nbsp;        double seconds = moveTimer.getDuration().toNanos() / 1_000_000_000.0;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            fire.run();</b>
+&nbsp;        } catch (RuntimeException exception) {
+<b class="fc">&nbsp;            moveTimer = null;</b>
+<b class="fc">&nbsp;            beginMove();</b>
+&nbsp;            throw exception;
+&nbsp;        }
+<b class="fc">&nbsp;        IMove move = game.getAlienMoves().getLast();</b>
+<b class="fc">&nbsp;        int hits = 0;</b>
+<b class="fc">&nbsp;        int misses = 0;</b>
+<b class="fc">&nbsp;        int sunk = 0;</b>
+<b class="fc">&nbsp;        for (IGame.ShotResult result : move.getShotResults()) {</b>
+<b class="pc">&nbsp;            if (result.valid() &amp;&amp; !result.repeated()) {</b>
+<b class="fc">&nbsp;                if (result.ship() == null) {</b>
+<b class="fc">&nbsp;                    misses++;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    hits++;</b>
+<b class="fc">&nbsp;                    if (result.sunk()) {</b>
+<b class="fc">&nbsp;                        sunk++;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        lastMove = new MoveReport(move.getNumber(), seconds, hits, misses, sunk);</b>
+<b class="fc">&nbsp;        System.out.printf(Locale.ROOT, &quot;Tempo da jogada nº%d: %.3f segundos.%n&quot;, move.getNumber(), seconds);</b>
+<b class="fc">&nbsp;        moveTimer = null;</b>
+<b class="fc">&nbsp;        return lastMove;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void beginSimulation() {
+<b class="fc">&nbsp;        ensurePlayable();</b>
+<b class="fc">&nbsp;        simulating = true;</b>
+<b class="fc">&nbsp;        moveTimer = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void simulateMove() {
+<b class="nc">&nbsp;        game.randomEnemyFire();</b>
+<b class="nc">&nbsp;        lastMove = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void endSimulation() {
+<b class="fc">&nbsp;        simulating = false;</b>
+<b class="fc">&nbsp;        beginMove();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Copies the board under the same lock used to submit moves. */
+&nbsp;    public synchronized BoardSnapshot snapshot() {
+<b class="fc">&nbsp;        boolean[][] ships = new boolean[Game.BOARD_SIZE][Game.BOARD_SIZE];</b>
+<b class="fc">&nbsp;        boolean[][] shots = new boolean[Game.BOARD_SIZE][Game.BOARD_SIZE];</b>
+<b class="pc">&nbsp;        if (game != null) {</b>
+<b class="fc">&nbsp;            for (IShip ship : game.getMyFleet().getShips()) {</b>
+<b class="fc">&nbsp;                for (IPosition position : ship.getPositions()) {</b>
+<b class="fc">&nbsp;                    ships[position.getRow()][position.getColumn()] = true;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            for (IMove move : game.getAlienMoves()) {</b>
+<b class="fc">&nbsp;                for (IPosition position : move.getShots()) {</b>
+<b class="pc">&nbsp;                    if (position.isInside()) {</b>
+<b class="fc">&nbsp;                        shots[position.getRow()][position.getColumn()] = true;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="pc">&nbsp;        return new BoardSnapshot(generation, game == null ? 1 : game.getAlienMoves().size() + 1,</b>
+<b class="pc">&nbsp;                game == null ? 0 : game.getRemainingShips(), game != null, simulating, ships, shots, lastMove);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record MoveReport(int number, double seconds, int hits, int misses, int sunk) {}</b>
+&nbsp;
+<b class="fc">&nbsp;    public record TimerSnapshot(double seconds, boolean running) {}</b>
+&nbsp;
+<b class="fc">&nbsp;    public record BoardSnapshot(int generation, int nextMove, int remainingShips, boolean hasGame,</b>
+&nbsp;                                boolean simulating, boolean[][] ships, boolean[][] shots, MoveReport lastMove) {
+&nbsp;        public boolean finished() {
+<b class="pc">&nbsp;            return hasGame &amp;&amp; remainingShips == 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-14 21:52</div>
+</div>
+</body>
+</html>

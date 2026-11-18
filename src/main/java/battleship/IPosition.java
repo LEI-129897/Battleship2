@@ -92,4 +92,17 @@ public interface IPosition
 	 * @return a list of adjacent positions as IPosition objects
 	 */
 	List<IPosition> adjacentPositions();
+
+	/**
+	 * Fills the positions of the Galleon when oriented to the NORTH.
+	 *
+	 * @param galleon
+	 */
+	default void fillNorth(Galleon galleon) {
+		for (int i = 0; i < 3; i++) {
+			galleon.getPositions().add(new Position(getRow(), getColumn() + i));
+		}
+		galleon.getPositions().add(new Position(getRow() + 1, getColumn() + 1));
+		galleon.getPositions().add(new Position(getRow() + 2, getColumn() + 1));
+	}
 }
