@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GamePlaySessionTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GestorIdiomaTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">GamePlaySessionTest.java</span></div><h1>GamePlaySessionTest.java</h1><pre class="source lang-java linenums">package battleship;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="nc" id="L10">class GamePlaySessionTest {</span>
+
+    private GamePlaySession session;
+    private Game game;
+
+    @BeforeEach
+    void setUp() {
+<span class="nc" id="L17">        GestorIdioma.setIdioma(&quot;pt&quot;);</span>
+<span class="nc" id="L18">        Fleet fleet = new Fleet();</span>
+<span class="nc" id="L19">        fleet.addShip(new Barge(Compass.NORTH, new Position(0, 0)));</span>
+<span class="nc" id="L20">        fleet.addShip(new Barge(Compass.NORTH, new Position(9, 9)));</span>
+<span class="nc" id="L21">        game = new Game(fleet);</span>
+<span class="nc" id="L22">        session = new GamePlaySession();</span>
+<span class="nc" id="L23">        session.setGame(game);</span>
+<span class="nc" id="L24">        session.beginMove();</span>
+<span class="nc" id="L25">    }</span>
+
+    @Test
+    void guiMoveUsesExistingRulesAndUpdatesTheBoardAndResults() {
+<span class="nc" id="L29">        GamePlaySession.MoveReport report = fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+
+<span class="nc" id="L31">        assertEquals(1, report.number());</span>
+<span class="nc" id="L32">        assertEquals(1, report.hits());</span>
+<span class="nc" id="L33">        assertEquals(2, report.misses());</span>
+<span class="nc" id="L34">        assertEquals(1, report.sunk());</span>
+<span class="nc" id="L35">        assertEquals(1, game.getHits());</span>
+<span class="nc" id="L36">        assertEquals(1, game.getSunkShips());</span>
+<span class="nc" id="L37">        assertEquals(1, game.getAlienMoves().size());</span>
+<span class="nc" id="L38">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L39">        assertEquals(2, board.nextMove());</span>
+<span class="nc" id="L40">        assertEquals(1, board.remainingShips());</span>
+<span class="nc" id="L41">        assertTrue(board.ships()[0][0]);</span>
+<span class="nc" id="L42">        assertTrue(board.shots()[0][0]);</span>
+<span class="nc" id="L43">        assertTrue(board.shots()[1][1]);</span>
+<span class="nc" id="L44">        assertFalse(board.shots()[3][3]);</span>
+<span class="nc" id="L45">        assertEquals(report, board.lastMove());</span>
+<span class="nc" id="L46">    }</span>
+
+    @Test
+    void requiresExactlyThreeTargetsWithoutChangingTheGame() {
+<span class="nc" id="L50">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+
+<span class="nc" id="L52">        assertThrows(IllegalArgumentException.class, () -&gt; session.fire(</span>
+<span class="nc" id="L53">                positions(&quot;A1&quot;, &quot;B2&quot;), board.generation(), board.nextMove()));</span>
+
+<span class="nc" id="L55">        assertTrue(game.getAlienMoves().isEmpty());</span>
+<span class="nc" id="L56">        assertEquals(2, game.getRemainingShips());</span>
+<span class="nc" id="L57">        assertNull(session.snapshot().lastMove());</span>
+<span class="nc" id="L58">    }</span>
+
+    @Test
+    void rejectsDuplicateTargetsWithinAGuiMove() {
+<span class="nc" id="L62">        assertThrows(IllegalArgumentException.class, () -&gt; fire(&quot;A1&quot;, &quot;A1&quot;, &quot;B2&quot;));</span>
+
+<span class="nc" id="L64">        assertTrue(game.getAlienMoves().isEmpty());</span>
+<span class="nc" id="L65">        assertEquals(0, game.getRepeatedShots());</span>
+<span class="nc" id="L66">    }</span>
+
+    @Test
+    void rejectsTargetsAlreadySubmittedByEitherInterface() {
+<span class="nc" id="L70">        session.fire(&quot;A1 B2 C3&quot;);</span>
+<span class="nc" id="L71">        session.beginMove();</span>
+
+<span class="nc" id="L73">        assertThrows(IllegalArgumentException.class, () -&gt; fire(&quot;A1&quot;, &quot;D4&quot;, &quot;E5&quot;));</span>
+
+<span class="nc" id="L75">        assertEquals(1, game.getAlienMoves().size());</span>
+<span class="nc" id="L76">        assertEquals(0, game.getRepeatedShots());</span>
+<span class="nc" id="L77">    }</span>
+
+    @Test
+    void terminalStillAcceptsAndCountsRepeatedShots() {
+<span class="nc" id="L81">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L82">        session.beginMove();</span>
+
+<span class="nc" id="L84">        session.fire(&quot;A1 D4 E5&quot;);</span>
+
+<span class="nc" id="L86">        assertEquals(2, game.getAlienMoves().size());</span>
+<span class="nc" id="L87">        assertEquals(1, game.getRepeatedShots());</span>
+<span class="nc" id="L88">        assertEquals(2, session.snapshot().lastMove().number());</span>
+<span class="nc" id="L89">    }</span>
+
+    @Test
+    void rejectsGuiSelectionsMadeBeforeATerminalMove() {
+<span class="nc" id="L93">        GamePlaySession.BoardSnapshot oldBoard = session.snapshot();</span>
+<span class="nc" id="L94">        session.fire(&quot;A1 B2 C3&quot;);</span>
+
+<span class="nc" id="L96">        assertThrows(IllegalArgumentException.class, () -&gt; session.fire(</span>
+<span class="nc" id="L97">                positions(&quot;D4&quot;, &quot;E5&quot;, &quot;F6&quot;), oldBoard.generation(), oldBoard.nextMove()));</span>
+
+<span class="nc" id="L99">        assertEquals(1, game.getAlienMoves().size());</span>
+<span class="nc" id="L100">    }</span>
+
+    @Test
+    void startingAnotherGameClearsHistoryAndRejectsOldSelections() {
+<span class="nc" id="L104">        GamePlaySession.BoardSnapshot oldBoard = session.snapshot();</span>
+<span class="nc" id="L105">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L106">        Fleet fleet = new Fleet();</span>
+<span class="nc" id="L107">        fleet.addShip(new Barge(Compass.NORTH, new Position(9, 9)));</span>
+<span class="nc" id="L108">        session.setGame(new Game(fleet));</span>
+
+<span class="nc" id="L110">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L111">        assertEquals(1, board.nextMove());</span>
+<span class="nc" id="L112">        assertNull(board.lastMove());</span>
+<span class="nc" id="L113">        assertFalse(board.shots()[0][0]);</span>
+<span class="nc" id="L114">        assertNotEquals(oldBoard.generation(), board.generation());</span>
+<span class="nc" id="L115">        assertThrows(IllegalArgumentException.class, () -&gt; session.fire(</span>
+<span class="nc" id="L116">                positions(&quot;D4&quot;, &quot;E5&quot;, &quot;F6&quot;), oldBoard.generation(), oldBoard.nextMove()));</span>
+<span class="nc" id="L117">    }</span>
+
+    @Test
+    void newGameReplacesTheFleetAndClearsThePreviousMoveAndTimer() {
+<span class="nc" id="L121">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L122">        session.beginMove();</span>
+<span class="nc" id="L123">        GamePlaySession.BoardSnapshot previous = session.snapshot();</span>
+
+<span class="nc" id="L125">        assertTrue(session.startNewGame());</span>
+
+<span class="nc" id="L127">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L128">        assertFalse(session.isGame(game));</span>
+<span class="nc" id="L129">        assertEquals(Fleet.FLEET_SIZE, board.remainingShips());</span>
+<span class="nc" id="L130">        assertNotEquals(previous.generation(), board.generation());</span>
+<span class="nc" id="L131">        assertEquals(1, board.nextMove());</span>
+<span class="nc" id="L132">        assertNull(board.lastMove());</span>
+<span class="nc" id="L133">        assertFalse(board.shots()[0][0]);</span>
+<span class="nc" id="L134">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L135">        session.beginMove();</span>
+<span class="nc" id="L136">        assertTrue(session.timerSnapshot().running());</span>
+<span class="nc" id="L137">    }</span>
+
+    @Test
+    void newGameDuringSimulationPreservesTheCurrentGameAndHistory() {
+<span class="nc" id="L141">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L142">        session.beginSimulation();</span>
+<span class="nc" id="L143">        GamePlaySession.BoardSnapshot previous = session.snapshot();</span>
+
+<span class="nc" id="L145">        assertFalse(session.startNewGame());</span>
+
+<span class="nc" id="L147">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L148">        assertTrue(session.isGame(game));</span>
+<span class="nc" id="L149">        assertTrue(board.simulating());</span>
+<span class="nc" id="L150">        assertEquals(previous.generation(), board.generation());</span>
+<span class="nc" id="L151">        assertEquals(previous.nextMove(), board.nextMove());</span>
+<span class="nc" id="L152">        assertEquals(previous.remainingShips(), board.remainingShips());</span>
+<span class="nc" id="L153">        assertEquals(previous.lastMove(), board.lastMove());</span>
+<span class="nc" id="L154">        assertTrue(board.shots()[0][0]);</span>
+<span class="nc" id="L155">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L156">    }</span>
+
+    @Test
+    void finishingTheGamePreventsAdditionalMovesAndKeepsTheLastResult() {
+<span class="nc" id="L160">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L161">        GamePlaySession.MoveReport last = fire(&quot;J10&quot;, &quot;D4&quot;, &quot;E5&quot;);</span>
+
+<span class="nc" id="L163">        assertTrue(session.snapshot().finished());</span>
+<span class="nc" id="L164">        assertEquals(0, session.snapshot().remainingShips());</span>
+<span class="nc" id="L165">        assertEquals(last, session.snapshot().lastMove());</span>
+<span class="nc" id="L166">        assertThrows(IllegalStateException.class, () -&gt; fire(&quot;F6&quot;, &quot;G7&quot;, &quot;H8&quot;));</span>
+<span class="nc" id="L167">        assertEquals(2, game.getAlienMoves().size());</span>
+<span class="nc" id="L168">    }</span>
+
+    @Test
+    void guiMovesHaveIndependentDecisionTimers() throws InterruptedException {
+<span class="nc" id="L172">        Thread.sleep(140);</span>
+<span class="nc" id="L173">        GamePlaySession.MoveReport first = fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L174">        session.beginMove();</span>
+<span class="nc" id="L175">        Thread.sleep(25);</span>
+<span class="nc" id="L176">        GamePlaySession.MoveReport second = fire(&quot;D4&quot;, &quot;E5&quot;, &quot;F6&quot;);</span>
+
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        assertTrue(first.seconds() &gt;= 0.120);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        assertTrue(second.seconds() &gt;= 0.015);</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        assertTrue(second.seconds() &lt; first.seconds());</span>
+<span class="nc" id="L181">    }</span>
+
+    @Test
+    void liveTimerAdvancesWithoutResettingAndStopsOnSubmission() throws InterruptedException {
+<span class="nc" id="L185">        Thread.sleep(80);</span>
+<span class="nc" id="L186">        GamePlaySession.TimerSnapshot first = session.timerSnapshot();</span>
+<span class="nc" id="L187">        assertTrue(first.running());</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        assertTrue(first.seconds() &gt;= 0.060);</span>
+
+<span class="nc" id="L190">        session.beginMove();</span>
+<span class="nc" id="L191">        Thread.sleep(30);</span>
+<span class="nc" id="L192">        GamePlaySession.TimerSnapshot second = session.timerSnapshot();</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        assertTrue(second.seconds() &gt;= first.seconds() + 0.020, &quot;Reading the timer must not restart it&quot;);</span>
+
+<span class="nc" id="L195">        GamePlaySession.MoveReport report = fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L196">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L197">        assertEquals(0, session.timerSnapshot().seconds());</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        assertTrue(report.seconds() &gt;= second.seconds());</span>
+<span class="nc" id="L199">        Thread.sleep(20);</span>
+<span class="nc" id="L200">        assertEquals(report, session.snapshot().lastMove(), &quot;The submitted duration stays fixed&quot;);</span>
+<span class="nc" id="L201">    }</span>
+
+    @Test
+    void nextMoveAndNewGameHaveFreshLiveTimers() throws InterruptedException {
+<span class="nc" id="L205">        Thread.sleep(80);</span>
+<span class="nc" id="L206">        GamePlaySession.MoveReport previous = fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L207">        session.beginMove();</span>
+
+<span class="nc" id="L209">        assertTrue(session.timerSnapshot().running());</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        assertTrue(session.timerSnapshot().seconds() &lt; previous.seconds());</span>
+<span class="nc" id="L211">        assertEquals(previous, session.snapshot().lastMove());</span>
+
+<span class="nc" id="L213">        Fleet fleet = new Fleet();</span>
+<span class="nc" id="L214">        fleet.addShip(new Barge(Compass.NORTH, new Position('A', 1)));</span>
+<span class="nc" id="L215">        session.setGame(new Game(fleet));</span>
+<span class="nc" id="L216">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L217">        assertNull(session.snapshot().lastMove());</span>
+<span class="nc" id="L218">        session.beginMove();</span>
+<span class="nc" id="L219">        assertTrue(session.timerSnapshot().running());</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        assertTrue(session.timerSnapshot().seconds() &lt; previous.seconds());</span>
+<span class="nc" id="L221">    }</span>
+
+    @Test
+    void simulationAndFinishedGamesDoNotRunALiveDecisionTimer() {
+<span class="nc" id="L225">        session.beginSimulation();</span>
+<span class="nc" id="L226">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L227">        assertEquals(0, session.timerSnapshot().seconds());</span>
+<span class="nc" id="L228">        session.endSimulation();</span>
+<span class="nc" id="L229">        assertTrue(session.timerSnapshot().running());</span>
+
+<span class="nc" id="L231">        fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;);</span>
+<span class="nc" id="L232">        session.beginMove();</span>
+<span class="nc" id="L233">        fire(&quot;J10&quot;, &quot;D4&quot;, &quot;E5&quot;);</span>
+<span class="nc" id="L234">        session.beginMove();</span>
+<span class="nc" id="L235">        assertTrue(session.snapshot().finished());</span>
+<span class="nc" id="L236">        assertFalse(session.timerSnapshot().running());</span>
+<span class="nc" id="L237">    }</span>
+
+    @Test
+    void snapshotsDoNotExposeMutableBoardState() {
+<span class="nc" id="L241">        GamePlaySession.BoardSnapshot snapshot = session.snapshot();</span>
+<span class="nc" id="L242">        snapshot.ships()[0][0] = false;</span>
+<span class="nc" id="L243">        snapshot.shots()[1][1] = true;</span>
+
+<span class="nc" id="L245">        assertTrue(session.snapshot().ships()[0][0]);</span>
+<span class="nc" id="L246">        assertFalse(session.snapshot().shots()[1][1]);</span>
+<span class="nc" id="L247">    }</span>
+
+    @Test
+    void rejectsManualMovesWhileTheTerminalIsSimulating() {
+<span class="nc" id="L251">        session.beginSimulation();</span>
+
+<span class="nc" id="L253">        assertTrue(session.snapshot().simulating());</span>
+<span class="nc" id="L254">        assertThrows(IllegalStateException.class, () -&gt; fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;));</span>
+<span class="nc" id="L255">        assertTrue(game.getAlienMoves().isEmpty());</span>
+
+<span class="nc" id="L257">        session.endSimulation();</span>
+<span class="nc" id="L258">        assertFalse(session.snapshot().simulating());</span>
+<span class="nc" id="L259">        assertDoesNotThrow(() -&gt; fire(&quot;A1&quot;, &quot;B2&quot;, &quot;C3&quot;));</span>
+<span class="nc" id="L260">    }</span>
+
+    private GamePlaySession.MoveReport fire(String... coordinates) {
+<span class="nc" id="L263">        GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L264">        return session.fire(positions(coordinates), board.generation(), board.nextMove());</span>
+    }
+
+    private List&lt;IPosition&gt; positions(String... coordinates) {
+<span class="nc" id="L268">        return java.util.Arrays.stream(coordinates)</span>
+<span class="nc" id="L269">                .&lt;IPosition&gt;map(coordinate -&gt; new Position(coordinate.charAt(0), Integer.parseInt(coordinate.substring(1))))</span>
+<span class="nc" id="L270">                .toList();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GestorIdiomaTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">GameTest.java</span></div><h1>GameTest.java</h1><pre class="source lang-java linenums">package battleship;
+
+import java.util.List;
+import java.util.Scanner;
+
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Test class for Game.
+ * Author: britoeabreu
+ * Date: 2024-03-19
+ * Time: 15:30
+ * Cyclomatic Complexity for each method:
+ * - Game (constructor): 1
+ * - fire: 7
+ * - getShots: 1
+ * - getRepeatedShots: 1
+ * - getInvalidShots: 1
+ * - getHits: 1
+ * - getSunkShips: 1
+ * - getRemainingShips: 1
+ * - validShot: 3
+ * - repeatedShot: 2
+ * - printBoard: 1
+ * - printValidShots: 1
+ * - printFleet: 1
+ */
+<span class="nc" id="L29">public class GameTest {</span>
+
+	private Game game;
+
+	@BeforeEach
+	void setUp() {
+<span class="nc" id="L35">		game = new Game(new Fleet()); // Assuming Fleet is a concrete implementation of IFleet</span>
+<span class="nc" id="L36">	}</span>
+
+	@AfterEach
+	void tearDown() {
+<span class="nc" id="L40">		game = null;</span>
+<span class="nc" id="L41">	}</span>
+
+	@Test
+	void constructor() {
+<span class="nc" id="L45">		assertNotNull(game, &quot;Game instance should not be null after construction.&quot;);</span>
+<span class="nc" id="L46">		assertNotNull(game.getAlienMoves(), &quot;Shots list should not be null after initialization.&quot;);</span>
+<span class="nc" id="L47">		assertTrue(game.getAlienMoves().isEmpty(), &quot;Shots list should be empty upon initialization.&quot;);</span>
+<span class="nc" id="L48">		assertEquals(0, game.getInvalidShots(), &quot;Invalid shots count should be zero upon initialization.&quot;);</span>
+<span class="nc" id="L49">		assertEquals(0, game.getRepeatedShots(), &quot;Repeated shots count should be zero upon initialization.&quot;);</span>
+<span class="nc" id="L50">		assertEquals(0, game.getHits(), &quot;Hits count should be zero upon initialization.&quot;);</span>
+<span class="nc" id="L51">		assertEquals(0, game.getSunkShips(), &quot;Sunk ships count should be zero upon initialization.&quot;);</span>
+<span class="nc" id="L52">	}</span>
+
+	@Test
+	void fire2() {
+<span class="nc" id="L56">		Position invalidPosition = new Position(-1, 5);</span>
+<span class="nc" id="L57">		game.fireSingleShot(invalidPosition, false);</span>
+<span class="nc" id="L58">		assertEquals(1, game.getInvalidShots(), &quot;Invalid shots counter should increase for an invalid shot.&quot;);</span>
+<span class="nc" id="L59">	}</span>
+
+	@Test
+	void fire3() {
+<span class="nc" id="L63">		Position position = new Position(2, 3);</span>
+<span class="nc" id="L64">		game.fireSingleShot(position, false);</span>
+<span class="nc" id="L65">		game.fireSingleShot(position, true);</span>
+<span class="nc" id="L66">		assertEquals(1, game.getRepeatedShots(), &quot;Repeated shots counter should increase for a repeated shot.&quot;);</span>
+<span class="nc" id="L67">	}</span>
+
+	@Test
+	void repeatedShot1() {
+<span class="nc" id="L71">		List&lt;IPosition&gt; positions = List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5));</span>
+<span class="nc" id="L72">		game.fireShots(positions);</span>
+<span class="nc" id="L73">		Position position = new Position(2, 3);</span>
+<span class="nc" id="L74">		assertTrue(game.repeatedShot(position), &quot;Position (2,3) should be marked as repeated after firing.&quot;);</span>
+<span class="nc" id="L75">	}</span>
+
+	@Test
+	void repeatedShot2() {
+<span class="nc" id="L79">		Position position = new Position(2, 3);</span>
+<span class="nc" id="L80">		assertFalse(game.repeatedShot(position), &quot;Position (2,3) should not be marked as repeated before firing.&quot;);</span>
+<span class="nc" id="L81">	}</span>
+
+	@Test
+	void getAlienMoves() {
+<span class="nc" id="L85">		List&lt;IPosition&gt; positions = List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5));</span>
+<span class="nc" id="L86">		game.fireShots(positions);</span>
+<span class="nc" id="L87">		assertEquals(1, game.getAlienMoves().size(), &quot;Shots list should contain one shot after firing once.&quot;);</span>
+<span class="nc" id="L88">	}</span>
+
+	@Test
+	void getRemainingShips() {
+<span class="nc" id="L92">		IFleet fleet = game.getMyFleet();</span>
+<span class="nc" id="L93">		Ship ship1 = new Barge(Compass.NORTH, new Position(1, 1));</span>
+<span class="nc" id="L94">		Ship ship2 = new Frigate(Compass.EAST, new Position(5, 5));</span>
+
+<span class="nc" id="L96">		fleet.addShip(ship1);</span>
+<span class="nc" id="L97">		assertEquals(1, game.getRemainingShips(), &quot;Just one ship was created!&quot;);</span>
+<span class="nc" id="L98">		fleet.addShip(ship2);</span>
+<span class="nc" id="L99">		assertEquals(2, game.getRemainingShips(), &quot;Two ships were created!&quot;);</span>
+<span class="nc" id="L100">		ship2.sink();</span>
+<span class="nc" id="L101">		assertEquals(1, game.getRemainingShips(), &quot;Remaining ships count should be 1 after sinking one of two ships.&quot;);</span>
+<span class="nc" id="L102">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test fireSingleShot - Miss Water (Ship null branch)&quot;)
+	void fireSingleShot1() {
+<span class="nc" id="L107">		IGame.ShotResult result = game.fireSingleShot(new Position(5, 5), false);</span>
+<span class="nc" id="L108">		assertAll(&quot;Miss water checks&quot;,</span>
+<span class="nc" id="L109">				() -&gt; assertTrue(result.valid(), &quot;Error: Shot should be valid.&quot;),</span>
+<span class="nc" id="L110">				() -&gt; assertFalse(result.repeated(), &quot;Error: Shot should not be repeated.&quot;),</span>
+<span class="nc" id="L111">				() -&gt; assertNull(result.ship(), &quot;Error: No ship should be hit.&quot;),</span>
+<span class="nc" id="L112">				() -&gt; assertFalse(result.sunk(), &quot;Error: No ship should be sunk.&quot;)</span>
+		);
+<span class="nc" id="L114">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test fireSingleShot - Hit without sinking (stillFloating true branch)&quot;)
+	void fireSingleShot2() {
+<span class="nc" id="L119">		Ship frigate = new Frigate(Compass.NORTH, new Position(2, 2));</span>
+<span class="nc" id="L120">		game.getMyFleet().addShip(frigate);</span>
+
+<span class="nc" id="L122">		IGame.ShotResult result = game.fireSingleShot(new Position(2, 2), false);</span>
+<span class="nc" id="L123">		assertAll(&quot;Hit without sink checks&quot;,</span>
+<span class="nc" id="L124">				() -&gt; assertTrue(result.valid(), &quot;Error: Shot should be valid.&quot;),</span>
+<span class="nc" id="L125">				() -&gt; assertNotNull(result.ship(), &quot;Error: Should hit the frigate.&quot;),</span>
+<span class="nc" id="L126">				() -&gt; assertFalse(result.sunk(), &quot;Error: Frigate should still be floating after 1 hit.&quot;),</span>
+<span class="nc" id="L127">				() -&gt; assertEquals(1, game.getHits(), &quot;Error: Hits should be 1.&quot;),</span>
+<span class="nc" id="L128">				() -&gt; assertEquals(0, game.getSunkShips(), &quot;Error: Sunk ships should be 0.&quot;)</span>
+		);
+<span class="nc" id="L130">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test fireShots - Valid Execution&quot;)
+	void fireShots1() {
+<span class="nc" id="L135">		List&lt;IPosition&gt; positions = List.of(new Position(0, 0), new Position(0, 1), new Position(0, 2));</span>
+<span class="nc" id="L136">		assertDoesNotThrow(() -&gt; game.fireShots(positions), &quot;Error: fireShots should execute successfully.&quot;);</span>
+<span class="nc" id="L137">		assertEquals(1, game.getAlienMoves().size(), &quot;Error: Alien moves size should be 1.&quot;);</span>
+<span class="nc" id="L138">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test fireShots - Too many shots exception branch&quot;)
+	void fireShots2() {
+<span class="nc" id="L143">		List&lt;IPosition&gt; tooManyShots = List.of(</span>
+				new Position(0, 0), new Position(0, 1), new Position(0, 2), new Position(0, 3)
+		);
+<span class="nc" id="L146">		assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L147">			game.fireShots(tooManyShots);</span>
+<span class="nc" id="L148">		}, &quot;Error: Should throw exception for invalid number of shots.&quot;);</span>
+<span class="nc" id="L149">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test randomEnemyFire execution&quot;)
+	void randomEnemyFire1() {
+<span class="nc" id="L154">		String json = game.randomEnemyFire();</span>
+<span class="nc" id="L155">		assertNotNull(json, &quot;Error: randomEnemyFire should return JSON.&quot;);</span>
+<span class="nc" id="L156">		assertEquals(1, game.getAlienMoves().size(), &quot;Error: Alien moves should increase.&quot;);</span>
+<span class="nc" id="L157">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test randomEnemyFire - Else Branch (Low candidate positions)&quot;)
+	void randomEnemyFire2() {
+<span class="nc bnc" id="L162" title="All 2 branches missed.">		for (int r = 0; r &lt; 10; r++) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">			for (int c = 0; c &lt; 10; c++) {</span>
+<span class="nc" id="L164">				game.getMyFleet().addShip(new Barge(Compass.NORTH, new Position(r, c)));</span>
+			}
+		}
+<span class="nc" id="L167">		game.getMyFleet().getShips().get(0).getPositions().get(0).shoot();</span>
+
+<span class="nc" id="L169">		String json = game.randomEnemyFire();</span>
+<span class="nc" id="L170">		assertNotNull(json, &quot;Error: randomEnemyFire should execute else branch successfully.&quot;);</span>
+<span class="nc" id="L171">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test randomEnemyFire - Else branch when fewer than 3 positions remain&quot;)
+	void randomEnemyFire3() {
+<span class="nc" id="L176">		List&lt;IPosition&gt; batch = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">		for (int r = 0; r &lt; 10; r++) {</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">			for (int c = 0; c &lt; 10; c++) {</span>
+<span class="nc bnc" id="L179" title="All 4 branches missed.">				if (r == 9 &amp;&amp; c == 9) break;</span>
+<span class="nc" id="L180">				batch.add(new Position(r, c));</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">				if (batch.size() == 3) {</span>
+<span class="nc" id="L182">					game.fireShots(new java.util.ArrayList&lt;&gt;(batch));</span>
+<span class="nc" id="L183">					batch.clear();</span>
+				}
+			}
+		}
+<span class="nc" id="L187">		String json = game.randomEnemyFire();</span>
+<span class="nc" id="L188">		assertNotNull(json, &quot;Error: Should execute else branch when candidateShots &lt; NUMBER_SHOTS.&quot;);</span>
+<span class="nc" id="L189">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test readEnemyFire - Valid Input&quot;)
+	void readEnemyFire1() {
+<span class="nc" id="L194">		Scanner scanner = new Scanner(&quot;A1 A2 A3&quot;);</span>
+<span class="nc" id="L195">		String json = game.readEnemyFire(scanner);</span>
+<span class="nc" id="L196">		assertNotNull(json, &quot;Error: readEnemyFire should return serialized shots.&quot;);</span>
+<span class="nc" id="L197">		assertEquals(1, game.getAlienMoves().size(), &quot;Error: Alien moves size should be 1.&quot;);</span>
+<span class="nc" id="L198">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test readEnemyFire - Letter without integer branch&quot;)
+	void readEnemyFire2() {
+<span class="nc" id="L203">		Scanner scanner = new Scanner(&quot;A B C&quot;);</span>
+<span class="nc" id="L204">		assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L205">			game.readEnemyFire(scanner);</span>
+<span class="nc" id="L206">		}, &quot;Error: Should throw exception when letter is not followed by integer.&quot;);</span>
+<span class="nc" id="L207">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test readEnemyFire - All exception and token branches&quot;)
+	void readEnemyFire3() {
+<span class="nc" id="L212">		assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L213">			game.readEnemyFire(new Scanner(&quot;A1 A2 B&quot;));</span>
+<span class="nc" id="L214">		}, &quot;Error: Should throw exception for incomplete token at the end.&quot;);</span>
+
+<span class="nc" id="L216">		assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L217">			game.readEnemyFire(new Scanner(&quot;A1 A2&quot;));</span>
+<span class="nc" id="L218">		}, &quot;Error: Should throw exception when fewer than 3 shots are given.&quot;);</span>
+
+<span class="nc" id="L220">		assertDoesNotThrow(() -&gt; {</span>
+<span class="nc" id="L221">			game.readEnemyFire(new Scanner(&quot;A 1 B 2 C 3&quot;));</span>
+<span class="nc" id="L222">		}, &quot;Error: Should parse separated letter and integer tokens.&quot;);</span>
+<span class="nc" id="L223">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test printBoardShots - Adjacent marker condition branch&quot;)
+	void printBoardShots1() {
+<span class="nc" id="L228">		Ship ship = new Barge(Compass.NORTH, new Position(1, 1));</span>
+<span class="nc" id="L229">		game.getMyFleet().addShip(ship);</span>
+<span class="nc" id="L230">		ship.getPositions().get(0).shoot();</span>
+
+<span class="nc" id="L232">		List&lt;IPosition&gt; shots = List.of(new Position(1, 2), new Position(0, 0), new Position(0, 1));</span>
+<span class="nc" id="L233">		game.fireShots(shots);</span>
+
+<span class="nc" id="L235">		assertDoesNotThrow(() -&gt; game.printMyBoard(true, false), &quot;Error: Should handle adjacent markers.&quot;);</span>
+<span class="nc" id="L236">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test printBoardShots - All branch combinations (outside, hit, adjacent, repeat)&quot;)
+	void printBoardShots2() {
+<span class="nc" id="L241">		Ship sunkBarge = new Barge(Compass.NORTH, new Position(0, 0));</span>
+<span class="nc" id="L242">		Ship floatingFrigate = new Frigate(Compass.EAST, new Position(5, 5));</span>
+<span class="nc" id="L243">		game.getMyFleet().addShip(sunkBarge);</span>
+<span class="nc" id="L244">		game.getMyFleet().addShip(floatingFrigate);</span>
+<span class="nc" id="L245">		sunkBarge.getPositions().get(0).shoot();</span>
+
+<span class="nc" id="L247">		game.fireShots(List.of(new Position(-1, -1), new Position(0, 1), new Position(5, 5)));</span>
+
+<span class="nc" id="L249">		game.fireShots(List.of(new Position(5, 5), new Position(9, 9), new Position(9, 8)));</span>
+
+<span class="nc" id="L251">		assertDoesNotThrow(() -&gt; game.printMyBoard(true, true), &quot;Error: Should cover all branches in printBoardShots.&quot;);</span>
+<span class="nc" id="L252">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test jsonShots serialization&quot;)
+	void jsonShots1() {
+<span class="nc" id="L257">		List&lt;IPosition&gt; shots = List.of(new Position(1, 1), new Position(2, 2));</span>
+<span class="nc" id="L258">		String json = Game.jsonShots(shots);</span>
+<span class="nc" id="L259">		assertNotNull(json, &quot;Error: JSON string should not be null.&quot;);</span>
+<span class="nc" id="L260">		assertTrue(json.contains(&quot;row&quot;), &quot;Error: JSON should contain row.&quot;);</span>
+<span class="nc" id="L261">	}</span>
+
+	@Test
+	@DisplayName(&quot;Test Getters for Fleets and Moves&quot;)
+	void gettersAndBoards1() {
+<span class="nc" id="L266">		assertNotNull(game.getMyFleet(), &quot;Error: myFleet should not be null.&quot;);</span>
+<span class="nc" id="L267">		assertNotNull(game.getAlienFleet(), &quot;Error: alienFleet should not be null.&quot;);</span>
+<span class="nc" id="L268">		assertNotNull(game.getMyMoves(), &quot;Error: myMoves should not be null.&quot;);</span>
+<span class="nc" id="L269">		assertDoesNotThrow(() -&gt; game.printMyBoard(false, false), &quot;Error: printMyBoard should execute.&quot;);</span>
+<span class="nc" id="L270">		assertDoesNotThrow(() -&gt; game.printAlienBoard(false, false), &quot;Error: printAlienBoard should execute.&quot;);</span>
+<span class="nc" id="L271">		assertDoesNotThrow(() -&gt; game.over(), &quot;Error: over should execute.&quot;);</span>
+<span class="nc" id="L272">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

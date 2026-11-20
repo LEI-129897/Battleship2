@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GamePlaySession.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GestorIdiomaTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">GamePlaySession.java</span></div><h1>GamePlaySession.java</h1><pre class="source lang-java linenums">package battleship;
+
+import org.apache.commons.lang3.time.StopWatch;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.function.Consumer;
+
+/** Shares game state and the decision timer between the terminal and JavaFX. */
+<span class="nc" id="L12">public class GamePlaySession {</span>
+
+    private IGame game;
+    private StopWatch moveTimer;
+    private MoveReport lastMove;
+    private int generation;
+    private boolean simulating;
+
+    public synchronized void setGame(IGame game) {
+<span class="nc" id="L21">        this.game = Objects.requireNonNull(game);</span>
+<span class="nc" id="L22">        moveTimer = null;</span>
+<span class="nc" id="L23">        lastMove = null;</span>
+<span class="nc" id="L24">        simulating = false;</span>
+<span class="nc" id="L25">        generation++;</span>
+<span class="nc" id="L26">    }</span>
+
+    /** Checks simulation state and replaces the game under the session's own lock. */
+    public synchronized boolean startNewGame() {
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (simulating) return false;</span>
+<span class="nc" id="L31">        setGame(new Game(Fleet.createRandom()));</span>
+<span class="nc" id="L32">        return true;</span>
+    }
+
+    public synchronized boolean hasGame() {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        return game != null;</span>
+    }
+
+    public synchronized boolean isGame(IGame candidate) {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        return game == candidate;</span>
+    }
+
+    public synchronized void withGame(Consumer&lt;IGame&gt; action) {
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (game != null) {</span>
+<span class="nc" id="L45">            action.accept(game);</span>
+        }
+<span class="nc" id="L47">    }</span>
+
+    public synchronized void beginMove() {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        boolean b = game != null;</span>
+<span class="nc bnc" id="L51" title="All 8 branches missed.">        if (b &amp;&amp; game.getRemainingShips() &gt; 0 &amp;&amp; !simulating &amp;&amp; moveTimer == null) {</span>
+<span class="nc" id="L52">            moveTimer = StopWatch.createStarted();</span>
+        }
+<span class="nc" id="L54">    }</span>
+
+    /** Reads the live stopwatch without stopping or restarting the current move. */
+    public synchronized TimerSnapshot timerSnapshot() {
+<span class="nc bnc" id="L58" title="All 6 branches missed.">        boolean running = moveTimer != null &amp;&amp; moveTimer.isStarted() &amp;&amp; !moveTimer.isStopped();</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        double seconds = running ? moveTimer.getDuration().toNanos() / 1_000_000_000.0 : 0;</span>
+<span class="nc" id="L60">        return new TimerSnapshot(seconds, running);</span>
+    }
+
+    /** Submits GUI coordinates atomically, including validation of stale selections. */
+    public synchronized MoveReport fire(List&lt;IPosition&gt; shots, int expectedGeneration, int expectedMove) {
+<span class="nc" id="L65">        ensurePlayable();</span>
+<span class="nc bnc" id="L66" title="All 4 branches missed.">        if (generation != expectedGeneration || game.getAlienMoves().size() + 1 != expectedMove) {</span>
+<span class="nc" id="L67">            throw new IllegalArgumentException(GestorIdioma.getMensagem(&quot;guiMoveChanged&quot;));</span>
+        }
+<span class="nc bnc" id="L69" title="All 4 branches missed.">        if (shots == null || shots.size() != Game.NUMBER_SHOTS</span>
+<span class="nc bnc" id="L70" title="All 6 branches missed.">                || shots.stream().anyMatch(position -&gt; position == null || !position.isInside())) {</span>
+<span class="nc" id="L71">            throw new IllegalArgumentException(GestorIdioma.getMensagemFormatada(&quot;guiSelectShots&quot;, Game.NUMBER_SHOTS));</span>
+        }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (int index = 0; index &lt; shots.size(); index++) {</span>
+<span class="nc" id="L74">            IPosition position = shots.get(index);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            if (shots.subList(0, index).contains(position)</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">                    || game.getAlienMoves().stream().anyMatch(move -&gt; move.getShots().contains(position))) {</span>
+<span class="nc" id="L77">                throw new IllegalArgumentException(GestorIdioma.getMensagem(&quot;guiAlreadyShot&quot;));</span>
+            }
+        }
+<span class="nc" id="L80">        List&lt;IPosition&gt; submittedShots = List.copyOf(shots);</span>
+<span class="nc" id="L81">        return submit(() -&gt; game.fireShots(submittedShots));</span>
+    }
+
+    /** Keeps the terminal's existing parser and repeated/outside shot rules. */
+    public synchronized MoveReport fire(String input) {
+<span class="nc" id="L86">        ensurePlayable();</span>
+<span class="nc" id="L87">        return submit(() -&gt; {</span>
+<span class="nc" id="L88">            try (Scanner scanner = new Scanner(input + &quot;\n&quot;)) {</span>
+<span class="nc" id="L89">                game.readEnemyFire(scanner);</span>
+            }
+<span class="nc" id="L91">        });</span>
+    }
+
+    private void ensurePlayable() {
+<span class="nc bnc" id="L95" title="All 4 branches missed.">        if (game == null || game.getRemainingShips() == 0) {</span>
+<span class="nc" id="L96">            throw new IllegalStateException(GestorIdioma.getMensagem(&quot;guiFinished&quot;));</span>
+        }
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (simulating) {</span>
+<span class="nc" id="L99">            throw new IllegalStateException(GestorIdioma.getMensagem(&quot;guiSimulating&quot;));</span>
+        }
+<span class="nc" id="L101">    }</span>
+
+    private MoveReport submit(Runnable fire) {
+<span class="nc" id="L104">        beginMove();</span>
+<span class="nc" id="L105">        moveTimer.stop();</span>
+<span class="nc" id="L106">        double seconds = moveTimer.getDuration().toNanos() / 1_000_000_000.0;</span>
+        try {
+<span class="nc" id="L108">            fire.run();</span>
+<span class="nc" id="L109">        } catch (RuntimeException exception) {</span>
+<span class="nc" id="L110">            moveTimer = null;</span>
+<span class="nc" id="L111">            beginMove();</span>
+<span class="nc" id="L112">            throw exception;</span>
+<span class="nc" id="L113">        }</span>
+<span class="nc" id="L114">        IMove move = game.getAlienMoves().getLast();</span>
+<span class="nc" id="L115">        int hits = 0;</span>
+<span class="nc" id="L116">        int misses = 0;</span>
+<span class="nc" id="L117">        int sunk = 0;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        for (IGame.ShotResult result : move.getShotResults()) {</span>
+<span class="nc bnc" id="L119" title="All 4 branches missed.">            if (result.valid() &amp;&amp; !result.repeated()) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                if (result.ship() == null) {</span>
+<span class="nc" id="L121">                    misses++;</span>
+                } else {
+<span class="nc" id="L123">                    hits++;</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                    if (result.sunk()) {</span>
+<span class="nc" id="L125">                        sunk++;</span>
+                    }
+                }
+            }
+<span class="nc" id="L129">        }</span>
+<span class="nc" id="L130">        lastMove = new MoveReport(move.getNumber(), seconds, hits, misses, sunk);</span>
+<span class="nc" id="L131">        System.out.printf(Locale.ROOT, &quot;Tempo da jogada nº%d: %.3f segundos.%n&quot;, move.getNumber(), seconds);</span>
+<span class="nc" id="L132">        moveTimer = null;</span>
+<span class="nc" id="L133">        return lastMove;</span>
+    }
+
+    public synchronized void beginSimulation() {
+<span class="nc" id="L137">        ensurePlayable();</span>
+<span class="nc" id="L138">        simulating = true;</span>
+<span class="nc" id="L139">        moveTimer = null;</span>
+<span class="nc" id="L140">    }</span>
+
+    public synchronized void simulateMove() {
+<span class="nc" id="L143">        game.randomEnemyFire();</span>
+<span class="nc" id="L144">        lastMove = null;</span>
+<span class="nc" id="L145">    }</span>
+
+    public synchronized void endSimulation() {
+<span class="nc" id="L148">        simulating = false;</span>
+<span class="nc" id="L149">        beginMove();</span>
+<span class="nc" id="L150">    }</span>
+
+    /** Copies the board under the same lock used to submit moves. */
+    public synchronized BoardSnapshot snapshot() {
+<span class="nc" id="L154">        boolean[][] ships = new boolean[Game.BOARD_SIZE][Game.BOARD_SIZE];</span>
+<span class="nc" id="L155">        boolean[][] shots = new boolean[Game.BOARD_SIZE][Game.BOARD_SIZE];</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (game != null) {</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            for (IShip ship : game.getMyFleet().getShips()) {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                for (IPosition position : ship.getPositions()) {</span>
+<span class="nc" id="L159">                    ships[position.getRow()][position.getColumn()] = true;</span>
+<span class="nc" id="L160">                }</span>
+<span class="nc" id="L161">            }</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            for (IMove move : game.getAlienMoves()) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                for (IPosition position : move.getShots()) {</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">                    if (position.isInside()) {</span>
+<span class="nc" id="L165">                        shots[position.getRow()][position.getColumn()] = true;</span>
+                    }
+<span class="nc" id="L167">                }</span>
+<span class="nc" id="L168">            }</span>
+        }
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        return new BoardSnapshot(generation, game == null ? 1 : game.getAlienMoves().size() + 1,</span>
+<span class="nc bnc" id="L171" title="All 4 branches missed.">                game == null ? 0 : game.getRemainingShips(), game != null, simulating, ships, shots, lastMove);</span>
+    }
+
+<span class="nc" id="L174">    public record MoveReport(int number, double seconds, int hits, int misses, int sunk) {}</span>
+
+<span class="nc" id="L176">    public record TimerSnapshot(double seconds, boolean running) {}</span>
+
+<span class="nc" id="L178">    public record BoardSnapshot(int generation, int nextMove, int remainingShips, boolean hasGame,</span>
+                                boolean simulating, boolean[][] ships, boolean[][] shots, MoveReport lastMove) {
+        public boolean finished() {
+<span class="nc bnc" id="L181" title="All 4 branches missed.">            return hasGame &amp;&amp; remainingShips == 0;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>
