@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TasksMoveTimingTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GestorIdiomaTest Coverage Results</a> &gt; <a href="index.source.html" class="el_package">battleship</a> &gt; <span class="el_source">TasksMoveTimingTest.java</span></div><h1>TasksMoveTimingTest.java</h1><pre class="source lang-java linenums">package battleship;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@Timeout(5)
+<span class="nc" id="L24">class TasksMoveTimingTest {</span>
+
+<span class="nc" id="L26">	private static final Pattern MOVE_TIME = Pattern.compile(</span>
+			&quot;Tempo da jogada nº(\\d+): (\\d+\\.\\d{3}) segundos\\.&quot;);
+
+	private InputStream originalIn;
+	private PrintStream originalOut;
+	private Locale originalLocale;
+	private ByteArrayOutputStream output;
+
+	@BeforeEach
+	void setUp() {
+<span class="nc" id="L36">		originalIn = System.in;</span>
+<span class="nc" id="L37">		originalOut = System.out;</span>
+<span class="nc" id="L38">		originalLocale = Locale.getDefault();</span>
+<span class="nc" id="L39">		output = new ByteArrayOutputStream();</span>
+<span class="nc" id="L40">		System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));</span>
+<span class="nc" id="L41">	}</span>
+
+	@AfterEach
+	void tearDown() {
+<span class="nc" id="L45">		System.setIn(originalIn);</span>
+<span class="nc" id="L46">		System.setOut(originalOut);</span>
+<span class="nc" id="L47">		Locale.setDefault(originalLocale);</span>
+<span class="nc" id="L48">	}</span>
+
+	@Test
+	void measuresDecisionAndInputTimeSeparatelyForEachMove() {
+<span class="nc" id="L52">		Locale.setDefault(Locale.GERMANY);</span>
+<span class="nc" id="L53">		System.setIn(new ScriptedInput(</span>
+				new InputChunk(&quot;1\ngerafrota\n&quot;, 0),
+				new InputChunk(&quot;ajuda\nestado\nmapa\ntiros\ninvalido\n&quot;, 150),
+				new InputChunk(&quot;rajada &quot;, 0),
+				new InputChunk(&quot;A1 B2 C3\n&quot;, 120),
+				new InputChunk(&quot;rajada A 1 D 4 E 5\n&quot;, 30),
+				new InputChunk(&quot;desisto\n&quot;, 0)));
+
+<span class="nc" id="L61">		runMenu();</span>
+
+<span class="nc" id="L63">		List&lt;Double&gt; times = moveTimes();</span>
+<span class="nc" id="L64">		assertEquals(2, times.size());</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">		assertTrue(times.get(0) &gt;= 0.250, &quot;Include the decision and coordinate entry delays&quot;);</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">		assertTrue(times.get(1) &gt;= 0.020, &quot;Measure the second move's input independently&quot;);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">		assertTrue(times.get(1) &lt; times.get(0), &quot;Do not accumulate previous move time&quot;);</span>
+<span class="nc" id="L68">		String console = output.toString(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L69">		assertTrue(console.contains(&quot;\&quot;repeatedShots\&quot; : 1&quot;), &quot;Keep existing repeated shot detection&quot;);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		assertTrue(console.indexOf(&quot;Jogada nº1 -&gt;&quot;) &lt; console.indexOf(&quot;Tempo da jogada nº1:&quot;));</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">		assertTrue(console.indexOf(&quot;Jogada nº2 -&gt;&quot;) &lt; console.indexOf(&quot;Tempo da jogada nº2:&quot;));</span>
+<span class="nc" id="L72">		assertTrue(console.endsWith(&quot;Bons ventos!&quot; + System.lineSeparator()));</span>
+<span class="nc" id="L73">	}</span>
+
+	@Test
+	void stopsAtSubmissionBeforeProcessingAndPrintingResults() {
+<span class="nc" id="L77">		System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8) {</span>
+			@Override
+			public void println(String message) {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">				if (message.startsWith(&quot;Jogada nº1 -&gt;&quot;)) {</span>
+					try {
+<span class="nc" id="L82">						Thread.sleep(350);</span>
+<span class="nc" id="L83">					} catch (InterruptedException exception) {</span>
+<span class="nc" id="L84">						Thread.currentThread().interrupt();</span>
+<span class="nc" id="L85">						throw new AssertionError(exception);</span>
+<span class="nc" id="L86">					}</span>
+				}
+<span class="nc" id="L88">				super.println(message);</span>
+<span class="nc" id="L89">			}</span>
+		});
+<span class="nc" id="L91">		System.setIn(new ScriptedInput(</span>
+				new InputChunk(&quot;1\ngerafrota\n&quot;, 0),
+				new InputChunk(&quot;rajada A1 B2 C3\n&quot;, 50),
+				new InputChunk(&quot;desisto\n&quot;, 0)));
+
+<span class="nc" id="L96">		runMenu();</span>
+
+<span class="nc" id="L98">		List&lt;Double&gt; times = moveTimes();</span>
+<span class="nc" id="L99">		assertEquals(1, times.size());</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">		assertTrue(times.getFirst() &gt;= 0.040);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">		assertTrue(times.getFirst() &lt; 0.300, &quot;Exclude the 350 ms spent displaying results&quot;);</span>
+<span class="nc" id="L102">	}</span>
+
+	@Test
+	void startsANewMeasurementWhenTheFleetIsReplaced() {
+<span class="nc" id="L106">		System.setIn(new ScriptedInput(</span>
+				new InputChunk(&quot;1\ngerafrota\n&quot;, 0),
+				new InputChunk(&quot;gerafrota\n&quot;, 250),
+				new InputChunk(&quot;rajada A1 B2 C3\n&quot;, 20),
+				new InputChunk(&quot;desisto\n&quot;, 0)));
+
+<span class="nc" id="L112">		runMenu();</span>
+
+<span class="nc" id="L114">		List&lt;Double&gt; times = moveTimes();</span>
+<span class="nc" id="L115">		assertEquals(1, times.size());</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">		assertTrue(times.getFirst() &lt; 0.200, &quot;Exclude time spent in the replaced game&quot;);</span>
+<span class="nc" id="L117">	}</span>
+
+	@Test
+	void doesNotReportTimeForCommandsWithoutAMove() {
+<span class="nc" id="L121">		System.setIn(new ScriptedInput(new InputChunk(</span>
+				&quot;1\nrajada\najuda\ngerafrota\nestado\nmapa\ntiros\ndesisto\n&quot;, 0)));
+
+<span class="nc" id="L124">		runMenu();</span>
+
+<span class="nc" id="L126">		assertTrue(moveTimes().isEmpty());</span>
+<span class="nc" id="L127">	}</span>
+
+	@Test
+	void preservesValidationForAnEmptySubmittedMove() {
+<span class="nc" id="L131">		System.setIn(new ScriptedInput(new InputChunk(&quot;1\ngerafrota\nrajada\ndesisto\n&quot;, 0)));</span>
+
+<span class="nc" id="L133">		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, this::runMenu);</span>
+
+<span class="nc" id="L135">		assertEquals(GestorIdioma.getMensagemFormatada(&quot;numeroPosicoes&quot;, Game.NUMBER_SHOTS),</span>
+<span class="nc" id="L136">				exception.getMessage());</span>
+<span class="nc" id="L137">		assertTrue(moveTimes().isEmpty());</span>
+<span class="nc" id="L138">	}</span>
+
+	@Test
+	void terminalAndGuiMovesShareTheSameHistoryAndTimer() {
+<span class="nc" id="L142">		System.setIn(new ScriptedInput(new InputChunk(</span>
+				&quot;1\ngerafrota\nrajada D4 E5 F6\ndesisto\n&quot;, 0)));
+<span class="nc" id="L144">		AtomicReference&lt;GamePlaySession&gt; shared = new AtomicReference&lt;&gt;();</span>
+<span class="nc" id="L145">		try (Scanner in = new Scanner(System.in)) {</span>
+<span class="nc" id="L146">			Tasks.menu(in, session -&gt; {</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">				if (shared.compareAndSet(null, session)) {</span>
+<span class="nc" id="L148">					GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L149">					session.fire(List.of(new Position('A', 1), new Position('B', 2), new Position('C', 3)),</span>
+<span class="nc" id="L150">							board.generation(), board.nextMove());</span>
+				}
+<span class="nc" id="L152">			});</span>
+		}
+
+<span class="nc" id="L155">		assertEquals(2, moveTimes().size());</span>
+<span class="nc" id="L156">		assertEquals(3, shared.get().snapshot().nextMove());</span>
+<span class="nc" id="L157">		double displayedGuiTime = Double.parseDouble(String.format(Locale.ROOT, &quot;%.3f&quot;,</span>
+<span class="nc" id="L158">				shared.get().snapshot().lastMove().seconds()));</span>
+<span class="nc" id="L159">		assertEquals(displayedGuiTime, moveTimes().getLast(), &quot;GUI and terminal display the same final duration&quot;);</span>
+<span class="nc" id="L160">	}</span>
+
+	@Test
+	void terminalStaysOpenIfGuiFinishesWhileCoordinatesAreBeingEntered() {
+<span class="nc" id="L164">		AtomicReference&lt;GamePlaySession&gt; shared = new AtomicReference&lt;&gt;();</span>
+<span class="nc" id="L165">		System.setIn(new ScriptedInput(</span>
+				new InputChunk(&quot;1\ngerafrota\n&quot;, 0),
+				new InputChunk(&quot;rajada &quot;, 0),
+				new InputChunk(&quot;D4 E5 F6\n&quot;, 0, () -&gt; {
+<span class="nc" id="L169">					GamePlaySession session = shared.get();</span>
+<span class="nc" id="L170">					GamePlaySession.BoardSnapshot board = session.snapshot();</span>
+<span class="nc" id="L171">					session.fire(List.of(new Position('A', 1), new Position('B', 2), new Position('C', 3)),</span>
+<span class="nc" id="L172">							board.generation(), board.nextMove());</span>
+<span class="nc" id="L173">				}),</span>
+				new InputChunk(&quot;desisto\n&quot;, 0)));
+<span class="nc" id="L175">		try (Scanner in = new Scanner(System.in)) {</span>
+<span class="nc" id="L176">			Tasks.menu(in, session -&gt; {</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">				if (shared.compareAndSet(null, session)) {</span>
+<span class="nc" id="L178">					Fleet fleet = new Fleet();</span>
+<span class="nc" id="L179">					fleet.addShip(new Barge(Compass.NORTH, new Position('A', 1)));</span>
+<span class="nc" id="L180">					session.setGame(new Game(fleet));</span>
+				}
+<span class="nc" id="L182">			});</span>
+		}
+
+<span class="nc" id="L185">		assertEquals(1, moveTimes().size());</span>
+<span class="nc" id="L186">		assertTrue(shared.get().snapshot().finished());</span>
+<span class="nc" id="L187">		String console = output.toString(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L188">		assertTrue(console.contains(GestorIdioma.getMensagem(&quot;guiFinished&quot;)));</span>
+<span class="nc" id="L189">		assertTrue(console.endsWith(&quot;Bons ventos!&quot; + System.lineSeparator()));</span>
+<span class="nc" id="L190">	}</span>
+
+	private void runMenu() {
+<span class="nc" id="L193">		try (Scanner in = new Scanner(System.in)) {</span>
+<span class="nc" id="L194">			Tasks.menu(in, game -&gt; {});</span>
+		}
+<span class="nc" id="L196">	}</span>
+
+	private List&lt;Double&gt; moveTimes() {
+<span class="nc" id="L199">		Matcher matcher = MOVE_TIME.matcher(output.toString(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L200">		List&lt;Double&gt; times = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">		while (matcher.find()) {</span>
+<span class="nc" id="L202">			assertEquals(times.size() + 1, Integer.parseInt(matcher.group(1)));</span>
+<span class="nc" id="L203">			times.add(Double.parseDouble(matcher.group(2)));</span>
+		}
+<span class="nc" id="L205">		return times;</span>
+	}
+
+<span class="nc" id="L208">	private record InputChunk(String text, long delayMillis, Runnable beforeRead) {</span>
+		InputChunk(String text, long delayMillis) {
+<span class="nc" id="L210">			this(text, delayMillis, () -&gt; {});</span>
+<span class="nc" id="L211">		}</span>
+	}
+
+	/** Supplies input in stages to model a player deciding and then submitting. */
+	private static class ScriptedInput extends InputStream {
+		private final InputChunk[] chunks;
+		private int nextChunk;
+<span class="nc" id="L218">		private byte[] bytes = new byte[0];</span>
+		private int offset;
+
+<span class="nc" id="L221">		ScriptedInput(InputChunk... chunks) {</span>
+<span class="nc" id="L222">			this.chunks = chunks;</span>
+<span class="nc" id="L223">		}</span>
+
+		@Override
+		public int read() throws IOException {
+<span class="nc bnc" id="L227" title="All 2 branches missed.">			return prepareChunk() ? bytes[offset++] &amp; 0xff : -1;</span>
+		}
+
+		@Override
+		public int read(byte[] buffer, int start, int length) throws IOException {
+<span class="nc bnc" id="L232" title="All 2 branches missed.">			if (length == 0) {</span>
+<span class="nc" id="L233">				return 0;</span>
+			}
+<span class="nc bnc" id="L235" title="All 2 branches missed.">			if (!prepareChunk()) {</span>
+<span class="nc" id="L236">				return -1;</span>
+			}
+<span class="nc" id="L238">			int count = Math.min(length, bytes.length - offset);</span>
+<span class="nc" id="L239">			System.arraycopy(bytes, offset, buffer, start, count);</span>
+<span class="nc" id="L240">			offset += count;</span>
+<span class="nc" id="L241">			return count;</span>
+		}
+
+		private boolean prepareChunk() throws IOException {
+<span class="nc bnc" id="L245" title="All 2 branches missed.">			while (offset == bytes.length) {</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">				if (nextChunk == chunks.length) {</span>
+<span class="nc" id="L247">					return false;</span>
+				}
+<span class="nc" id="L249">				InputChunk chunk = chunks[nextChunk++];</span>
+				try {
+<span class="nc" id="L251">					Thread.sleep(chunk.delayMillis());</span>
+<span class="nc" id="L252">				} catch (InterruptedException exception) {</span>
+<span class="nc" id="L253">					Thread.currentThread().interrupt();</span>
+<span class="nc" id="L254">					throw new IOException(exception);</span>
+<span class="nc" id="L255">				}</span>
+<span class="nc" id="L256">				chunk.beforeRead().run();</span>
+<span class="nc" id="L257">				bytes = chunk.text().getBytes(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L258">				offset = 0;</span>
+<span class="nc" id="L259">			}</span>
+<span class="nc" id="L260">			return true;</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>
