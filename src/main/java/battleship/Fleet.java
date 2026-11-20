@@ -5,6 +5,7 @@ package battleship;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * The type Fleet.
@@ -135,12 +136,7 @@ public class Fleet implements IFleet
     @Override
     public List<IShip> getFloatingShips()
     {
-		List<IShip> floatingShips = new ArrayList<IShip>();
-		for (IShip s : ships)
-			if (s.stillFloating())
-				floatingShips.add(s);
-
-		return floatingShips;
+		return getShipsMatching(IShip::stillFloating);
     }
 
 	/**
@@ -156,12 +152,16 @@ public class Fleet implements IFleet
 	@Override
 	public List<IShip> getSunkShips()
 	{
-		List<IShip> sunkShips = new ArrayList<IShip>();
-		for (IShip s : ships)
-			if (!s.stillFloating())
-				sunkShips.add(s);
+		return getShipsMatching(ship -> !ship.stillFloating());
+	}
 
-		return sunkShips;
+	private List<IShip> getShipsMatching(Predicate<IShip> condition)
+	{
+		List<IShip> matchingShips = new ArrayList<IShip>();
+		for (IShip ship : ships)
+			if (condition.test(ship))
+				matchingShips.add(ship);
+		return matchingShips;
 	}
 
 	/**

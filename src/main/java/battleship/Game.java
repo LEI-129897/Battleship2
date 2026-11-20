@@ -142,7 +142,7 @@ public class Game implements IGame
 			simplifiedShots.add(simplePos);
 		}
 
-		String jsonString = null;
+		String jsonString;
 		try {
 			// 2. Serialize the simplified list instead of the raw 'shots' list
 			jsonString = objectMapper.writeValueAsString(simplifiedShots);
@@ -240,8 +240,12 @@ public class Game implements IGame
 			for (int c = 0; c < BOARD_SIZE; c++)
 				usablePositions.add(new Position(r, c));
 
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
+		for (IShip ship : this.myFleet.getSunkShips())
+			for (IPosition position : ship.getAdjacentPositions())
+				usablePositions.remove(position);
+		for (IMove move : this.alienMoves)
+			for (IPosition shot : move.getShots())
+				usablePositions.remove(shot);
 
 		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
 

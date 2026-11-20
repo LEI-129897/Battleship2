@@ -115,6 +115,16 @@ public abstract class Ship implements IShip
 		setPositions(new ArrayList<>());
     }
 
+	protected void addHorizontalPositions(IPosition pos) {
+		for (int columnOffset = 0; columnOffset < getSize(); columnOffset++)
+			getPositions().add(new Position(pos.getRow(), pos.getColumn() + columnOffset));
+	}
+
+	protected void addVerticalPositions(IPosition pos) {
+		for (int rowOffset = 0; rowOffset < getSize(); rowOffset++)
+			getPositions().add(new Position(pos.getRow() + rowOffset, pos.getColumn()));
+	}
+
 	/**
 	 * Gets category.
 	 *
@@ -239,9 +249,11 @@ public abstract class Ship implements IShip
     public int getTopMostPos()
     {
 	int top = getPositions().get(0).getRow();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getRow() < top)
-		top = getPositions().get(i).getRow();
+    for (int i = 1; i < getSize(); i++) {
+    	if (getPositions().get(i).getRow() < top) {
+    		top = getPositions().get(i).getRow();
+    	}
+    }
 	return top;
     }
 
@@ -299,9 +311,11 @@ public abstract class Ship implements IShip
     public int getRightMostPos()
     {
 	int right = getPositions().get(0).getColumn();
-	for (int i = 1; i < getSize(); i++)
-	    if (getPositions().get(i).getColumn() > right)
-		right = getPositions().get(i).getColumn();
+	for (int i = 1; i < getSize(); i++) {
+		if (getPositions().get(i).getColumn() > right) {
+			right = getPositions().get(i).getColumn();
+		}
+	}
 	return right;
     }
 
