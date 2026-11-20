@@ -21,3 +21,8 @@
 | Ship.java::`getTopMostPos()`        | Suspicious indentation after `if` (Qodana: SuspiciousIndentAfterControlStatement) | Add Braces / Reformat Code | 124790 |
 | Ship.java::`getRightMostPos()`      | Suspicious indentation after `if` (Qodana: SuspiciousIndentAfterControlStatement) | Add Braces / Reformat Code | 124790 |
 | Game.java::`jsonShots()`            | Redundant null initializer (Qodana: UnusedAssignment) | Remove Redundant Initialization | 124790 |
+| Position.java::'equals()' | Redundant Cast / Explicit instanceof check | Replace 'instanceof' with pattern variable | 129821 |
+| Fleet.java::colisionRisk() |Uncommunicative Name (gralha no nome / parâmetro s)	| Rename |	129821|
+| Compass.java::charToCompass()	| Verbose Switch Statement (atribuição repetida a variável local) | Replace 'switch' with 'switch' expression |	129821|
+| Compass.java::charToCompass() |Redundant Local Variable (bearing)	| Inline Variable	|129821|
+|Ship.java::getLeftMostPos()	|Indexed access to first element (get(0))	|Replace 'get(0)' with 'getFirst()'	| 129821|

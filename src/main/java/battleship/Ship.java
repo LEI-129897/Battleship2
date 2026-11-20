@@ -310,7 +310,7 @@ public abstract class Ship implements IShip
     @Override
     public int getRightMostPos()
     {
-	int right = getPositions().get(0).getColumn();
+	int right = getPositions().getFirst().getColumn();
 	for (int i = 1; i < getSize(); i++) {
 		if (getPositions().get(i).getColumn() > right) {
 			right = getPositions().get(i).getColumn();
